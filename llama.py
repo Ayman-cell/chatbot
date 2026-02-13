@@ -873,21 +873,76 @@ def load_conversations():
     
     for filename in os.listdir(CONVERSATIONS_DIR):
         if filename.startswith("conv_") and filename.endswith(".json"):
+            filepath = f"{CONVERSATIONS_DIR}/{filename}"
             try:
-                with open(f"{CONVERSATIONS_DIR}/{filename}", 'r', encoding='utf-8') as f:
+                # Vérifier si le fichier est vide
+                if os.path.getsize(filepath) == 0:
+                    # Supprimer les fichiers vides
+                    os.remove(filepath)
+                    continue
+                
+                with open(filepath, 'r', encoding='utf-8') as f:
                     conv_data = json.load(f)
-                conversations.append(conv_data)
+                
+                # Valider que les données essentielles existent
+                if conv_data and isinstance(conv_data, dict) and "messages" in conv_data:
+                    conversations.append(conv_data)
+                else:
+                    # Fichier corrompu, le supprimer
+                    os.remove(filepath)
+            except json.JSONDecodeError:
+                # Fichier JSON invalide, le supprimer silencieusement
+                try:
+                    os.remove(filepath)
+                except:
+                    pass
             except Exception as e:
-                st.error(f"Erreur lors du chargement de {filename}: {e}")
+                # Autres erreurs
+                pass
     
-    conversations.sort(key=lambda x: x["timestamp"], reverse=True)
+    conversations.sort(key=lambda x: x.get("timestamp", ""), reverse=True)
     return conversations
 
 def load_conversation(conversation_id):
     """Charge une conversation spécifique"""
     filename = f"{CONVERSATIONS_DIR}/conv_{conversation_id}.json"
     try:
+        # Vérifier si le fichier existe et n'est pas vide
+        if not os.path.exists(filename):
+            st.error("Conversation non trouvée")
+            return None
+        
+        if os.path.getsize(filename) == 0:
+            st.error("Fichier de conversation corrompu (vide)")
+            try:
+                os.remove(filename)
+            except:
+                pass
+            return None
+        
         with open(filename, 'r', encoding='utf-8') as f:
+            conv_data = json.load(f)
+        
+        # Valider les données
+        if not conv_data or not isinstance(conv_data, dict) or "messages" not in conv_data:
+            st.error("Fichier de conversation corrompu (données invalides)")
+            try:
+                os.remove(filename)
+            except:
+                pass
+            return None
+            
+        return conv_data
+    except json.JSONDecodeError:
+        st.error("Fichier de conversation corrompu (JSON invalide)")
+        try:
+            os.remove(filename)
+        except:
+            pass
+        return None
+    except Exception as e:
+        st.error(f"Erreur lors du chargement: {str(e)}")
+        return None
             return json.load(f)
     except Exception as e:
         st.error(f"Erreur lors du chargement de la conversation: {e}")
