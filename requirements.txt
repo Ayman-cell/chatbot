@@ -1,7 +1,7 @@
-streamlit==1.28.1
-langchain==0.0.354
-langchain-cerebras>=0.1.0
-python-dotenv==1.0.0
-requests==2.31.0
-pandas==2.1.4
-numpy==1.26.3
+streamlit>=1.28.1
+langchain>=1.1.0
+langchain-cerebras==0.8.2
+python-dotenv>=1.0.0
+requests>=2.31.0
+pandas>=2.1.0
+numpy>=1.26.0
