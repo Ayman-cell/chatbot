@@ -982,100 +982,96 @@ def add_latex_css():
     </style>
     """, unsafe_allow_html=True)
 
-# Styles CSS modernes
+# Styles CSS modernes - Design magnifique et simple
 st.markdown("""
 <style>
-/* Styles CSS modernes */
-.stApp {
-    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 30%, #16213e 70%, #0f3460 100%);
-    color: #ffffff;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
+/* Background principal - Gradient moderne et élégant */
+.stApp {
+    background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1629 100%);
+    color: #ffffff;
+    font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+}
+
+/* En-tête principal - Style premium */
 .main-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-    padding: 3rem;
-    border-radius: 25px;
-    margin-bottom: 2rem;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+    padding: 4rem 3rem;
+    border-radius: 20px;
+    margin-bottom: 3rem;
     text-align: center;
     color: white;
-    box-shadow: 0 25px 50px rgba(102, 126, 234, 0.4);
-    backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 20px 60px rgba(99, 102, 241, 0.4), 0 0 40px rgba(236, 72, 153, 0.2);
     position: relative;
     overflow: hidden;
-}
-
-.mode-selector {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    padding: 2.5rem;
-    border-radius: 25px;
-    margin-bottom: 2rem;
-    box-shadow: 0 20px 40px rgba(79, 172, 254, 0.3);
-    backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    position: relative;
-}
-
-.chat-container {
-    background: linear-gradient(135deg, #2d3748 0%, #4a5568 50%, #2d3748 100%);
-    padding: 2.5rem;
-    border-radius: 25px;
-    margin-bottom: 2rem;
-    color: white;
-    box-shadow: 0 20px 40px rgba(45, 55, 72, 0.4);
-    backdrop-filter: blur(15px);
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.feature-card {
-    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+.main-header h1 {
+    font-size: 2.8rem !important;
+    font-weight: 800 !important;
+    margin-bottom: 1rem !important;
+    letter-spacing: -1px;
+}
+
+.main-header p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 0.5rem;
+}
+
+/* Sélecteur de mode - Design épuré */
+.mode-selector {
+    background: linear-gradient(135deg, rgba(30, 41, 82, 0.8) 0%, rgba(45, 60, 110, 0.8) 100%);
     padding: 2.5rem;
     border-radius: 20px;
-    box-shadow: 0 15px 35px rgba(30, 60, 114, 0.4);
-    border: 1px solid rgba(102, 126, 234, 0.3);
-    margin-bottom: 2rem;
-    color: #e2e8f0;
-    backdrop-filter: blur(15px);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 2.5rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+/* Carte des features */
+.feature-card {
+    background: linear-gradient(135deg, rgba(30, 41, 82, 0.9) 0%, rgba(45, 60, 110, 0.9) 100%);
+    padding: 2rem;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    margin-bottom: 1.5rem;
+    color: #e0e7ff;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
 }
 
 .feature-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 25px 50px rgba(30, 60, 114, 0.6);
+    box-shadow: 0 20px 50px rgba(99, 102, 241, 0.3);
+    border-color: rgba(99, 102, 241, 0.5);
 }
 
-.token-info {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 2rem;
-    border-radius: 20px;
-    color: white;
-    margin-bottom: 2rem;
-    text-align: center;
-    box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
-    backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+.feature-card h4 {
+    color: #e879f9 !important;
+    margin-bottom: 1rem !important;
+    font-size: 1.2rem !important;
 }
 
-.processing-status {
-    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-    padding: 2rem;
-    border-radius: 20px;
-    color: white;
-    margin-bottom: 2rem;
-    box-shadow: 0 15px 30px rgba(17, 153, 142, 0.4);
-}
-
+/* Boutons - Design moderne */
 .stButton > button {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
     color: white;
     border: none;
-    border-radius: 30px;
-    padding: 1rem 3rem;
+    border-radius: 12px;
+    padding: 0.8rem 2.5rem;
     font-weight: 600;
-    font-size: 16px;
+    font-size: 1rem;
     transition: all 0.3s ease;
-    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     text-transform: uppercase;
@@ -1083,278 +1079,192 @@ st.markdown("""
 }
 
 .stButton > button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 20px 40px rgba(102, 126, 234, 0.6);
-    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 15px 40px rgba(99, 102, 241, 0.4);
+    background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
 }
 
-.language-indicator {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    padding: 1rem 2rem;
-    border-radius: 30px;
-    color: white;
-    font-weight: 600;
-    display: inline-block;
-    margin-bottom: 2rem;
-    box-shadow: 0 10px 25px rgba(79, 172, 254, 0.4);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+.stButton > button:active {
+    transform: translateY(0px);
 }
 
+/* Messages de chat - Élégant */
 .stChatMessage {
-    background: linear-gradient(135deg, rgba(30, 60, 114, 0.9) 0%, rgba(42, 82, 152, 0.9) 100%) !important;
-    border-radius: 25px !important;
-    padding: 2rem !important;
-    margin-bottom: 2rem !important;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.4) !important;
+    background: linear-gradient(135deg, rgba(30, 41, 82, 0.95) 0%, rgba(45, 60, 110, 0.95) 100%) !important;
+    border-radius: 18px !important;
+    padding: 1.5rem !important;
+    margin-bottom: 1.5rem !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
     backdrop-filter: blur(20px) !important;
-    border: 1px solid rgba(102, 126, 234, 0.3) !important;
-    transition: transform 0.2s ease !important;
-}
-
-.stChatMessage:hover {
-    transform: translateY(-2px) !important;
+    border: 1px solid rgba(99, 102, 241, 0.2) !important;
+    transition: all 0.2s ease !important;
 }
 
 .stChatMessage[data-testid="chat-message-user"] {
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.9) 0%, rgba(139, 92, 246, 0.9) 100%) !important;
+    border: 1px solid rgba(236, 72, 153, 0.3) !important;
+    margin-left: 0 !important;
 }
 
 .stChatMessage[data-testid="chat-message-assistant"] {
-    background: linear-gradient(135deg, rgba(79, 172, 254, 0.9) 0%, rgba(0, 242, 254, 0.9) 100%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-}
-
-.chatbot-signature {
-    text-align: right;
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    background: linear-gradient(135deg, rgba(30, 144, 255, 0.85) 0%, rgba(0, 191, 255, 0.85) 100%) !important;
+    border: 1px solid rgba(0, 191, 255, 0.3) !important;
 }
 
 .stChatMessage .stMarkdown {
     color: #ffffff !important;
-    font-size: 16px !important;
-    line-height: 1.8 !important;
+    font-size: 1rem !important;
+    line-height: 1.6 !important;
 }
 
 .stChatMessage .stMarkdown p {
     color: #ffffff !important;
-    margin-bottom: 1rem !important;
+    margin-bottom: 0.8rem !important;
 }
 
-.stChatMessage .stMarkdown h1, .stChatMessage .stMarkdown h2, .stChatMessage .stMarkdown h3, .stChatMessage .stMarkdown h4, .stChatMessage .stMarkdown h5, .stChatMessage .stMarkdown h6 {
-    color: #f093fb !important;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    margin-bottom: 1rem !important;
-}
-
+/* Input de chat */
 .stChatInputContainer {
-    background: linear-gradient(135deg, rgba(30, 60, 114, 0.9) 0%, rgba(42, 82, 152, 0.9) 100%) !important;
-    border-radius: 30px !important;
-    border: 2px solid rgba(102, 126, 234, 0.5) !important;
-    padding: 1rem !important;
+    background: linear-gradient(135deg, rgba(30, 41, 82, 0.8) 0%, rgba(45, 60, 110, 0.8) 100%) !important;
+    border-radius: 15px !important;
+    border: 2px solid rgba(99, 102, 241, 0.3) !important;
+    padding: 0.8rem !important;
     backdrop-filter: blur(20px) !important;
-    box-shadow: 0 15px 30px rgba(0,0,0,0.3) !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+    transition: all 0.3s ease !important;
+}
+
+.stChatInputContainer:focus-within {
+    border-color: rgba(99, 102, 241, 0.6) !important;
+    box-shadow: 0 15px 40px rgba(99, 102, 241, 0.3) !important;
 }
 
 .stChatInputContainer input {
     color: #ffffff !important;
-    font-size: 16px !important;
+    font-size: 1rem !important;
     background: transparent !important;
     font-weight: 500 !important;
 }
 
 .stChatInputContainer input::placeholder {
-    color: #a0aec0 !important;
+    color: #8892b0 !important;
     font-style: italic;
 }
 
-.css-1d391kg {
-    background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%);
-    border-right: 1px solid rgba(102, 126, 234, 0.3);
+/* Sidebar */
+.stSidebar {
+    background: linear-gradient(180deg, rgba(15, 22, 41, 0.95) 0%, rgba(20, 29, 53, 0.95) 100%) !important;
 }
 
 .stSidebar .stMarkdown {
-    color: #e2e8f0;
+    color: #e0e7ff;
 }
 
-.stSidebar .stSelectbox label, .stSidebar .stFileUploader label, .stSidebar .stSlider label {
-    color: #e2e8f0 !important;
-    font-weight: 600;
+.stSidebar .stButton > button {
+    width: 100%;
+    margin-bottom: 0.8rem;
 }
 
+/* Selectbox */
 .stSelectbox > div > div {
-    background: rgba(30, 60, 114, 0.8) !important;
+    background: rgba(30, 41, 82, 0.8) !important;
     backdrop-filter: blur(15px) !important;
-    border: 1px solid rgba(102, 126, 234, 0.4) !important;
-    border-radius: 15px !important;
+    border: 1px solid rgba(99, 102, 241, 0.3) !important;
+    border-radius: 12px !important;
     color: #ffffff !important;
 }
 
+/* File uploader */
 .stFileUploader > div {
-    background: rgba(30, 60, 114, 0.8) !important;
+    background: rgba(30, 41, 82, 0.8) !important;
     backdrop-filter: blur(15px) !important;
-    border: 2px dashed rgba(79, 172, 254, 0.6) !important;
-    border-radius: 20px !important;
-    transition: border-color 0.3s ease;
+    border: 2px dashed rgba(99, 102, 241, 0.5) !important;
+    border-radius: 15px !important;
+    transition: all 0.3s ease;
 }
 
 .stFileUploader > div:hover {
-    border-color: rgba(79, 172, 254, 0.8) !important;
+    border-color: rgba(139, 92, 246, 0.8) !important;
+    background: rgba(99, 102, 241, 0.1) !important;
 }
 
+/* Progress bar */
 .stProgress > div > div {
-    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%) !important;
+    background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%) !important;
     border-radius: 10px !important;
 }
 
-.save-notification {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 9999;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    border-radius: 20px;
-    box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
-    backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    animation: slideInRight 0.5s ease-out;
-    max-width: 380px;
-    min-width: 320px;
+/* Expander */
+.streamlit-expanderHeader {
+    background: rgba(99, 102, 241, 0.1) !important;
+    border: 1px solid rgba(99, 102, 241, 0.2) !important;
+    border-radius: 10px !important;
+    color: #e0e7ff !important;
 }
 
-.notification-content {
-    display: flex;
-    align-items: center;
-    padding: 20px;
-    color: white;
-}
-
-.notification-icon {
-    font-size: 28px;
-    margin-right: 15px;
-    animation: bounce 0.6s ease-in-out;
-}
-
-.notification-text {
-    flex: 1;
-}
-
-.notification-title {
-    font-weight: 700;
-    font-size: 17px;
-    margin-bottom: 5px;
-}
-
-.notification-details {
-    font-size: 14px;
-    opacity: 0.9;
-    margin-bottom: 3px;
-}
-
-.notification-meta {
-    font-size: 12px;
-    opacity: 0.7;
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(40px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes slideInRight {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-@keyframes bounce {
-    0%, 20%, 50%, 80%, 100% {
-        transform: translateY(0);
-    }
-    40% {
-        transform: translateY(-12px);
-    }
-    60% {
-        transform: translateY(-6px);
-    }
-}
-
+/* Scrollbar personnalisée */
 ::-webkit-scrollbar {
     width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-    background: rgba(30, 60, 114, 0.5);
-    border-radius: 15px;
+    background: rgba(30, 41, 82, 0.5);
+    border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 15px;
-    border: 2px solid rgba(30, 60, 114, 0.5);
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    border-radius: 10px;
+    border: 2px solid rgba(30, 41, 82, 0.5);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
 }
 
+/* Animations douces */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.stChatMessage {
+    animation: fadeIn 0.3s ease-out !important;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-    .save-notification {
-        right: 10px;
-        left: 10px;
-        max-width: none;
-        min-width: auto;
-    }
-    
     .main-header {
-        padding: 2rem;
+        padding: 2.5rem 1.5rem;
     }
     
-    .mode-selector, .chat-container, .feature-card {
+    .main-header h1 {
+        font-size: 2rem !important;
+    }
+    
+    .feature-card {
         padding: 1.5rem;
     }
 }
 
-.glass-effect {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+/* Texte et typographie */
+h1, h2, h3, h4, h5, h6 {
+    color: #e0e7ff !important;
 }
 
-.stButton > button[kind="primary"] {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
-    box-shadow: 0 15px 35px rgba(79, 172, 254, 0.4) !important;
+/* Métrique */
+.stMetric {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid rgba(99, 102, 241, 0.2);
 }
 
-.stButton > button[kind="primary"]:hover {
-    background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%) !important;
-    box-shadow: 0 20px 45px rgba(79, 172, 254, 0.6) !important;
-}
-
-.stButton > button[kind="secondary"] {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100") !important;
-    opacity: 0.8;
-}
-
-.stButton > button[kind="secondary"]:hover {
-    opacity: 1;
-    transform: translateY(-2px);
-}
 </style>
 """, unsafe_allow_html=True)
 
@@ -1653,12 +1563,18 @@ def display_cerebras_usage_dashboard():
 def main():
     add_latex_css()
     
-    # En-tête principal
+    # En-tête principal - Premium
     st.markdown("""
     <div class="main-header">
-        <h1>🧠 Assistant IA Multilingue - Cerebras Llama 3.1-8B</h1>
-        <p>Votre assistant intelligent avec Cerebras et rendu mathématique parfait</p>
-        <p><strong>🚀 Modèle:</strong> Llama 3.1-8B | <strong>⚡ Plateforme:</strong> Cerebras</p>
+        <h1>✨ Assistant IA Multilingue Cerebras</h1>
+        <p style="margin-bottom: 1.5rem; font-size: 1.2rem; opacity: 0.95;">
+            Conversez avec l'intelligence artificielle avancée
+        </p>
+        <div style="display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; font-size: 0.95rem; opacity: 0.9;">
+            <span>🚀 Modèle: <strong>Llama 3.1-8B</strong></span>
+            <span>⚡ Plateforme: <strong>Cerebras</strong></span>
+            <span>🌍 Multilingue</span>
+        </div>
     </div>
     """, unsafe_allow_html=True)
     
@@ -1681,10 +1597,12 @@ def main():
                 rendered = render_latex_content(formula)
                 st.markdown(rendered, unsafe_allow_html=True)
     
-    # Sélecteur de mode
+    # Sélecteur de mode - Élégant
     st.markdown("""
     <div class="mode-selector">
-        <h3 style="color: white; text-align: center; margin-bottom: 1rem;">🎯 Choisissez votre mode Cerebras</h3>
+        <h3 style="text-align: center; margin-bottom: 1.5rem; color: #e0e7ff; font-size: 1.3rem;">
+            🎯 Choisissez votre mode
+        </h3>
     </div>
     """, unsafe_allow_html=True)
     
@@ -1704,9 +1622,11 @@ def main():
     
     # Affichage du mode actuel
     mode_text = "📚 Service Client" if st.session_state.chat_mode == "customer_service" else "💬 Chat Général"
+    # Affichage du mode actuel - Amélioré
     st.markdown(f"""
-    <div class="chat-container">
-        <h3>Mode actuel: {mode_text} (Cerebras Llama 3.1-8B avec rendu LaTeX)</h3>
+    <div class="feature-card">
+        <h4>Mode sélectionné</h4>
+        <p style="margin: 0; font-size: 1.1rem;">{mode_text}</p>
     </div>
     """, unsafe_allow_html=True)
     
@@ -1775,10 +1695,10 @@ def main():
         
         st.markdown("""
         <div class="feature-card">
-            <h4>📚 Service Client Intelligent avec Cerebras Llama 3.1-8B</h4>
-            <p>Téléchargez vos documents et posez des questions. L'IA Cerebras analysera vos fichiers pour vous donner des réponses précises avec rendu mathématique automatique.</p>
-            <p><strong>Formats supportés:</strong> PDF, Word, PowerPoint, Excel, Texte</p>
-            <p><strong>🧠 Modèle:</strong> Llama 3.1-8B sur Cerebras | <strong>🔍 Nouveau:</strong> RAG avancé avec chunking intelligent!</p>
+            <h4>📚 Service Client Intelligent</h4>
+            <p>Téléchargez vos documents et posez des questions. L'IA analyse precision ensuite vous donne des réponses détaillées et pertinentes.</p>
+            <p style="margin-bottom: 0.5rem;"><strong>📄 Formats:</strong> PDF • Word • PowerPoint • Excel • Texte</p>
+            <p style="margin: 0; font-size: 0.9rem; opacity: 0.8;">✨ RAG avancé • 🧠 Llama 3.1-8B • ⚡ Temps réel</p>
         </div>
         """, unsafe_allow_html=True)
         
@@ -1948,10 +1868,10 @@ def main():
         
         st.markdown("""
         <div class="feature-card">
-            <h4>💬 Chat Général avec Cerebras Llama 3.1-8B</h4>
-            <p>Discutez librement avec l'IA Cerebras sur n'importe quel sujet. L'assistant détectera automatiquement votre langue et rendra les équations mathématiques en LaTeX.</p>
-            <p><strong>Langues supportées:</strong> Français, English, Español, العربية, Deutsch, Italiano</p>
-            <p><strong>🧠 Modèle:</strong> Llama 3.1-8B sur Cerebras | <strong>🔍 Nouveau:</strong> Rendu automatique des équations LaTeX!</p>
+            <h4>💬 Chat Général Multilingue</h4>
+            <p>Conversez librement sur n'importe quel sujet. L'IA détecte automatiquement votre langue et fournit des réponses intelligentes et détaillées.</p>
+            <p style="margin-bottom: 0.5rem;"><strong>🌍 Langues:</strong> Français • English • Español • العربية • Deutsch • Italiano</p>
+            <p style="margin: 0; font-size: 0.9rem; opacity: 0.8;">✨ Conversation libre • 🧠 Llama 3.1-8B • ⚡ Temps réel</p>
         </div>
         """, unsafe_allow_html=True)
         
