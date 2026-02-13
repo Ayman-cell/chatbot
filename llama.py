@@ -1033,7 +1033,7 @@ def add_latex_css():
     </style>
     """, unsafe_allow_html=True)
 
-# Configuration MathJax pour le rendu LaTeX robuste et fiable
+# Configuration MathJax avancée pour le rendu LaTeX complet
 st.markdown("""
 <script>
   MathJax = {
@@ -1041,14 +1041,36 @@ st.markdown("""
       inlineMath: [['$', '$'], ['\\\\(', '\\\\)']],
       displayMath: [['$$', '$$'], ['\\\\[', '\\\\]']],
       processEscapes: true,
-      processEnvironments: true
+      processEnvironments: true,
+      packages: {
+        '[+]': ['amsmath', 'amssymb', 'amsfonts', 'cancel', 'empheq']
+      },
+      tags: 'ams',
+      envs: {
+        align: ['AMS', 'aligned'],
+        aligned: ['AMS', 'aligned'],
+        gather: ['AMS', 'gathered'],
+        gathered: ['AMS', 'gathered'],
+        multline: ['AMS', 'multlined'],
+        equation: ['AMS', 'equation'],
+        eqnarray: ['AMS', 'eqnarray']
+      }
+    },
+    chtml: {
+      displayAlign: 'left',
+      displayIndent: '0em'
     },
     svg: {
       fontCache: 'global',
-      scale: 1
+      scale: 1,
+      displayAlign: 'left',
+      displayIndent: '0em'
     },
     startup: {
-      typeset: true
+      typeset: true,
+      pageReady: () => {
+        return MathJax.typesetPromise();
+      }
     }
   };
 </script>
@@ -1353,40 +1375,54 @@ h1, h2, h3, h4, h5, h6 {
     border: 1px solid #e5e5e5;
 }
 
-/* Styles pour le rendu LaTeX/MathJax - Optimisé pour tous les délimiteurs */
+/* Styles pour le rendu LaTeX/MathJax - Support complet des environnements */
 .katex-html,
 .MathJax_Display,
 .mjx-chtml,
 .MathJax {
     color: #0d0d0d !important;
     font-size: inherit;
+    line-height: 1.75;
 }
 
 /* Conteneurs des équations display (avec \[ \] ou $$ $$) */
 .stMarkdown .katex-display,
 .stMarkdown .MathJax_Display,
 .stMarkdown .mjx-chtml[display="true"],
-p:has(> .katex-display) {
+.stMarkdown table + .katex-display,
+p:has(> .katex-display),
+div:has(> .MathJax_Display) {
     background: #f7f7f8 !important;
-    padding: 1.2rem !important;
+    padding: 1.5rem !important;
     border-radius: 8px !important;
     border-left: 4px solid #d0d0d0 !important;
-    margin: 1.2rem 0 !important;
+    margin: 1.5rem 0 !important;
     overflow-x: auto;
     display: block !important;
+    white-space: normal;
+}
+
+/* Support spécifique des environnements align/aligned */
+.stMarkdown .katex-display .mtable,
+.stMarkdown .MathJax_Display .MathJax_merror,
+.stMarkdown div.MJX_Assistive_MathML {
+    display: inline-block;
+    width: 100%;
 }
 
 /* Équations inline (avec $ $ ou \( \)) */
 .stMarkdown .katex,
 .stMarkdown .MathJax,
-.stMarkdown .mjx-chtml[display="false"] {
+.stMarkdown .mjx-chtml[display="false"],
+.stMarkdown span .katex {
     font-size: 1.05em;
     display: inline;
+    margin: 0 0.1em;
 }
 
 /* Améliorations typographiques pour LaTeX */
 .stMarkdown {
-    line-height: 1.65;
+    line-height: 1.7;
 }
 
 /* Support pour tous les types MathJax */
@@ -1394,10 +1430,31 @@ p:has(> .katex-display) {
     color: #0d0d0d !important;
 }
 
+/* Pour les modes CHTML et SVG */
+.mjx-container {
+    display: inline;
+}
+
+.mjx-container[display="true"] {
+    display: block;
+    text-align: left;
+    margin: 1rem 0;
+}
+
 /* Scrolling horizontal pour équations complexes */
-.stMarkdown pre:has(.katex) {
+.stMarkdown pre:has(.katex),
+.stMarkdown code:has(.katex) {
     overflow-x: auto;
     max-width: 100%;
+    background: transparent;
+    padding: 0;
+}
+
+/* Support du contenu multi-lignes */
+.stMarkdown table.katex-render,
+.stMarkdown .katex-container,
+.stMarkdown .MathJax-Element {
+    width: 100%;
 }
 
 </style>
@@ -1612,26 +1669,31 @@ def initialize_general_llm_with_limits():
     )
 
 def contains_latex(text: str) -> bool:
-    """Détecte si un texte contient du code LaTeX"""
-    # Détecte les patterns LaTeX avec délimiteurs
+    """Détecte si un texte contient du code LaTeX - support complet"""
     patterns = [
-        r'\\\[',           # \[
-        r'\\\]',           # \]
-        r'\$\$',           # $$
-        r'(?<!\\\)\$(?!\$)',  # Single $
-        r'\\begin{',       # \begin{
+        r'\\\[',                    # \[ display
+        r'\\\]',                    # \] display
+        r'\$\$',                    # $$ display
+        r'(?<!\\\)\$(?!\$)',       # Single $ inline
+        r'\\begin\{',               # \begin{ environments
+        r'\\\(',                    # \( inline LaTeX
+        r'\\\)',                    # \) inline LaTeX
     ]
     return any(re.search(pattern, text) for pattern in patterns)
 
 def extract_latex_equations(text: str):
-    """Extrait les équations LaTeX d'un texte"""
+    """Extrait toutes les équations LaTeX du texte"""
     equations = []
     
-    # Trouver les [ ... ] équations
+    # Trouver les environnements \begin{...}\end{...}
+    equations.extend(re.findall(r'\\begin\{.*?\}.*?\\end\{.*?\}', text, re.DOTALL))
+    # Trouver les \[ ... \] équations
     equations.extend(re.findall(r'\\\[.*?\\\]', text, re.DOTALL))
     # Trouver les $$ ... $$ équations
     equations.extend(re.findall(r'\$\$.*?\$\$', text, re.DOTALL))
-    # Trouver les $ ... $ équations
+    # Trouver les \(...\) équations inline
+    equations.extend(re.findall(r'\\\(.*?\\\)', text, re.DOTALL))
+    # Trouver les $ ... $ équations inline
     equations.extend(re.findall(r'(?<!\$)\$[^\$]+\$(?!\$)', text, re.DOTALL))
     
     return equations
@@ -1641,20 +1703,25 @@ def render_latex_content(text: str) -> str:
     if not text:
         return ""
     
-    # Étape 1: Normaliser les délimiteurs LaTeX display (priorité haute)
-    # \[ ... \] → \[ ... \] (garder tel quel, MathJax le supporte)
+    # Étape 1: Envelopper les environnements \begin{...}\end{...} dans \[ ... \]
+    # pour assurer qu'ils sont reconnus comme display math
+    text = re.sub(
+        r'(?<!\[)\\begin\{(aligned|equation|eqnarray|align|gather|multline|flalign|alignat)\}(.*?)\\end\{\1\}(?!\])',
+        r'\\\[\n\\begin{\1}\2\\end{\1}\n\\\]',
+        text,
+        flags=re.DOTALL
+    )
     
     # Étape 2: Normaliser les délimiteurs LaTeX inline
-    # \(...\) → $...$  (convertir en format universellement supporté)
+    # \(...\) → $...$
     text = re.sub(r'\\\((.*?)\\\)', r'$\1$', text, flags=re.DOTALL)
     
-    # Étape 3: Ajouter espaces autour des équations display pour lisibilité
-    # \[ ... \] avec espaces autour
-    text = re.sub(r'(\S)\\\[', r'\1 \\\[', text)  # Espace avant
-    text = re.sub(r'\\\](\S)', r'\\\] \1', text)  # Espace après
+    # Étape 3: Espaces autour des délimiteurs display pour lisibilité
+    text = re.sub(r'(\S)\\\[', r'\1\n\n\\\[', text)  # Nouveau ligne avant
+    text = re.sub(r'\\\](\S)', r'\\\]\n\n\1', text)  # Nouveau ligne après
     
     # Étape 4: Nettoyer les multiples espaces et retours à la ligne
-    text = re.sub(r'\n\s*\n+', r'\n\n', text)
+    text = re.sub(r'\n\n\n+', r'\n\n', text)
     
     # Étape 5: Éviter les espaces accidentels dans les délimiteurs
     text = re.sub(r'\$\s+', '$', text)
