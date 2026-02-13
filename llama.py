@@ -1491,20 +1491,45 @@ def initialize_general_llm_with_limits():
 
 def contains_latex(text: str) -> bool:
     """Détecte si un texte contient du code LaTeX"""
-    return False
+    # Détecte les patterns LaTeX avec délimiteurs
+    patterns = [
+        r'\\\[',           # \[
+        r'\\\]',           # \]
+        r'\$\$',           # $$
+        r'(?<!\\\)\$(?!\$)',  # Single $
+        r'\\begin{',       # \begin{
+    ]
+    return any(re.search(pattern, text) for pattern in patterns)
 
 def extract_latex_equations(text: str):
     """Extrait les équations LaTeX d'un texte"""
-    return []
+    equations = []
+    
+    # Trouver les [ ... ] équations
+    equations.extend(re.findall(r'\\\[.*?\\\]', text, re.DOTALL))
+    # Trouver les $$ ... $$ équations
+    equations.extend(re.findall(r'\$\$.*?\$\$', text, re.DOTALL))
+    # Trouver les $ ... $ équations
+    equations.extend(re.findall(r'(?<!\$)\$[^\$]+\$(?!\$)', text, re.DOTALL))
+    
+    return equations
 
 def render_latex_content(text: str) -> str:
-    """Retourne le texte tel quel sans conversion LaTeX"""
+    """Convertit les délimiteurs LaTeX pour Streamlit"""
     if not text:
         return ""
+    
+    # Convertir [ ... ] en $$ ... $$ (Streamlit utilise $$)
+    text = re.sub(r'\\\[(.*?)\\\]', r'$$\1$$', text, flags=re.DOTALL)
+    
+    # Nettoyer les espaces excessifs autour des équations
+    text = re.sub(r'\$\$\s+', '$$', text)
+    text = re.sub(r'\s+\$\$', '$$', text)
+    
     return text
 
 def display_ai_response_with_latex(response: str, token_manager):
-    """Affiche la réponse de l'IA sans conversion LaTeX"""
+    """Affiche la réponse de l'IA avec support LaTeX via Markdown"""
     try:
         if not response:
             st.warning("Réponse vide reçue")
@@ -1512,8 +1537,11 @@ def display_ai_response_with_latex(response: str, token_manager):
         
         tokens_used = token_manager.count_tokens(response)
         
-        # Afficher le texte directement sans conversion LaTeX
-        st.markdown(response)
+        # Convertir les délimiteurs LaTeX et afficher
+        rendered_response = render_latex_content(response)
+        
+        # Utiliser st.markdown qui supporte LaTeX via MathJax
+        st.markdown(rendered_response)
         
         with st.expander("ℹ️ Informations sur la réponse Cerebras", expanded=False):
             col1, col2 = st.columns(2)
