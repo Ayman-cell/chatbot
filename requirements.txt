@@ -1,33 +1,26 @@
 # Core Framework
 streamlit>=1.28.0
-streamlit-extras>=0.3.0
 
-# LangChain & LLM - Latest compatible versions
-langchain>=0.1.0
-langchain-core>=0.1.0
-langchain-community>=0.0.20
-langchain-cerebras>=0.6.0
+# LangChain - Old compatible versions with legacy imports
+langchain==0.0.352
+langchain-cerebras==0.6.0
 
 # API & HTTP
 requests>=2.31.0
-urllib3>=2.0.7
 
-# Data Processing & Math
+# Data Processing
 pandas>=2.0.0
 numpy>=1.24.0
 scipy>=1.10.0
-python-dateutil>=2.8.2
 
 # Excel & Office Documents
 openpyxl>=3.1.0
 python-docx>=0.8.10
-python-pptx>=0.6.21
 
 # PDF Processing
 pypdf>=3.17.0
-pdf2image>=1.16.0
 
-# Embeddings & Vector Stores (with CPU support)
+# Embeddings & Vector Stores
 sentence-transformers>=2.2.0
 faiss-cpu>=1.7.4
 scikit-learn>=1.3.0
@@ -38,41 +31,19 @@ tokenizers>=0.13.0
 tiktoken>=0.5.0
 
 # Deep Learning
-torch>=2.0.0,<2.2.0
+torch>=2.0.0
 torchvision>=0.15.0
-torchaudio>=2.0.0
 
-# ML & Optimization
+# ML
 scikit-optimize>=0.9.0
 
-# HuggingFace Integration
+# HuggingFace
 huggingface-hub>=0.17.0
 
-# Configuration & Environment
+# Config
 python-dotenv>=1.0.0
 pydantic>=2.0.0
-typing-extensions>=4.8.0
-
-# JSON & Serialization
-jsonschema>=4.20.0
-orjson>=3.9.0
 
 # Utilities
 chardet>=5.2.0
-certifi>=2023.7.0
-idna>=3.6
-charset-normalizer>=3.3.0
-
-# Logging & Monitoring
-colorlog>=6.8.0
-python-json-logger>=2.0.0
-
-# System & Performance
-psutil>=5.9.0
-pytz>=2023.3
-
-# Security
-cryptography>=41.0.0
-
-# Additional performance
-cython>=0.29.0
+python-dateutil>=2.8.2
