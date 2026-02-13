@@ -38,7 +38,7 @@ if not os.path.exists(CONVERSATIONS_DIR):
     os.makedirs(CONVERSATIONS_DIR)
 
 # Configuration de l'API Cerebras
-CEREBRAS_API_KEY = "csk-mnv698mvc25hmmnvhrcmfj2mvmf3v5nrrvxtwrn8m5r848jy"
+CEREBRAS_API_KEY = "csk-phdt3299268dpcdx9efnpydcjxj66vnp42yjh63mc2k6eh6n"
 os.environ["CEREBRAS_API_KEY"] = CEREBRAS_API_KEY
 
 # Configuration des limites de tokens pour Llama 3.1-8B sur Cerebras
