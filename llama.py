@@ -24,12 +24,7 @@ if not os.path.exists(CONVERSATIONS_DIR):
     os.makedirs(CONVERSATIONS_DIR)
 
 # ========== CONFIGURATION DE L'API CEREBRAS ==========
-try:
-    CEREBRAS_API_KEY = st.secrets["CEREBRAS_API_KEY"]
-except KeyError:
-    st.error("❌ CEREBRAS_API_KEY n'est pas configurée!")
-    st.info("Allez dans: Settings → Secrets → Ajoutez: CEREBRAS_API_KEY = 'votre-clé'")
-    st.stop()
+CEREBRAS_API_KEY = "csk-wcmnmtnhn9d5hdx25mkmy2h3k4cyj6kdx9fd9v4emd8545xd"
 
 os.environ["CEREBRAS_API_KEY"] = CEREBRAS_API_KEY
 
