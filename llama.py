@@ -40,7 +40,7 @@ if not os.path.exists(CONVERSATIONS_DIR):
 # Configuration de l'API Cerebras
 try:
     # Prefer Streamlit secrets (set in Streamlit Cloud UI)
-    CEREBRAS_API_KEY = st.secrets.get("CEREBRAS_API_KEY")
+    CEREBRAS_API_KEY = "csk-phdt3299268dpcdx9efnpydcjxj66vnp42yjh63mc2k6eh6n"
 except Exception:
     CEREBRAS_API_KEY = None
 
