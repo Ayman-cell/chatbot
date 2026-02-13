@@ -966,73 +966,8 @@ def load_conversation_to_session(conv):
         st.rerun()
 
 def add_latex_css():
-    """Ajoute le CSS et JavaScript pour le rendu LaTeX amélioré"""
+    """Ajoute le CSS pour l'affichage simplifié"""
     st.markdown("""
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>
-    window.MathJax = {
-        tex: {
-            inlineMath: [['$', '$'], ['\$$', '\$$']],
-            displayMath: [['$$', '$$'], ['\\[', '\\]']],
-            processEscapes: true,
-            processEnvironments: true,
-            macros: {
-                RR: "\\mathbb{R}",
-                NN: "\\mathbb{N}",
-                ZZ: "\\mathbb{Z}",
-                QQ: "\\mathbb{Q}",
-                CC: "\\mathbb{C}",
-                min: "\\operatorname{min}",
-                max: "\\operatorname{max}",
-                argmin: "\\operatorname{argmin}",
-                argmax: "\\operatorname{argmax}",
-                grad: "\\nabla",
-                div: "\\nabla\\cdot",
-                curl: "\\nabla\\times"
-            }
-        },
-        options: {
-            ignoreHtmlClass: "tex2jax_ignore",
-            processHtmlClass: "tex2jax_process"
-        },
-        startup: {
-            ready: () => {
-                MathJax.startup.defaultReady();
-                console.log('MathJax is loaded and ready!');
-            }
-        }
-    };
-    
-    function renderMathJax() {
-        if (window.MathJax && window.MathJax.typesetPromise) {
-            window.MathJax.typesetPromise().catch((err) => console.log(err.message));
-        }
-    }
-    
-    const observer = new MutationObserver(function(mutations) {
-        let shouldRender = false;
-        mutations.forEach(function(mutation) {
-            if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-                for (let node of mutation.addedNodes) {
-                    if (node.nodeType === 1 && (node.textContent.includes('$') || node.textContent.includes('\\('))) {
-                        shouldRender = true;
-                        break;
-                    }
-                }
-            }
-        });
-        if (shouldRender) {
-            setTimeout(renderMathJax, 100);
-        }
-    });
-    
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true
-    });
-    </script>
-    
     <style>
     .math-container {
         background: linear-gradient(135deg, #f8f9ff 0%, #e8f4fd 100%);
@@ -1043,65 +978,6 @@ def add_latex_css():
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         position: relative;
         overflow-x: auto;
-    }
-    
-    .math-container::before {
-        content: "📐 Formule Mathématique";
-        position: absolute;
-        top: -10px;
-        left: 15px;
-        background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 4px 12px;
-        border-radius: 15px;
-        font-size: 12px;
-        font-weight: bold;
-    }
-    
-    .math-inline {
-        background: rgba(102, 126, 234, 0.1);
-        padding: 2px 6px;
-        border-radius: 4px;
-        border: 1px solid rgba(102, 126, 234, 0.2);
-    }
-    
-    .math-error {
-        background: #ffe6e6;
-        border: 2px solid #ff9999;
-        border-radius: 8px;
-        padding: 10px;
-        margin: 10px 0;
-        color: #cc0000;
-        font-family: monospace;
-    }
-    
-    .math-fallback {
-        background: #fff3cd;
-        border: 1px solid #ffeaa7;
-        border-radius: 6px;
-        padding: 8px;
-        margin: 5px 0;
-        font-family: 'Courier New', monospace;
-        color: #856404;
-    }
-    
-    .math-rendering {
-        opacity: 0.6;
-        transition: opacity 0.3s ease;
-    }
-    
-    .math-rendered {
-        opacity: 1;
-        transition: opacity 0.3s ease;
-    }
-    
-    .MathJax {
-        font-size: 1.1em !important;
-    }
-    
-    .MathJax_Display {
-        margin: 1em 0 !important;
-        text-align: center !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -1692,111 +1568,29 @@ def initialize_general_llm_with_limits():
 
 def contains_latex(text: str) -> bool:
     """Détecte si un texte contient du code LaTeX"""
-    latex_indicators = [
-        r'\$.*?\$',
-        r'\$\$.*?\$\$',
-        r'\\[a-zA-Z]+',
-        r'\\begin\{',
-        r'\\frac\{',
-        r'\\int',
-        r'\\sum',
-        r'\\prod',
-        r'\\sqrt',
-        r'\^[{]',
-        r'_[{]',
-    ]
-    
-    for pattern in latex_indicators:
-        if re.search(pattern, text):
-            return True
     return False
 
 def extract_latex_equations(text: str):
     """Extrait les équations LaTeX d'un texte"""
-    equations = []
-    
-    # Équations display ($$...$$)
-    display_pattern = r'\$\$(.*?)\$\$'
-    for match in re.finditer(display_pattern, text, re.DOTALL):
-        equations.append({
-            'type': 'display',
-            'content': match.group(1).strip(),
-            'full': match.group(0),
-            'start': match.start(),
-            'end': match.end()
-        })
-    
-    # Équations inline ($...$) - éviter les doubles $
-    text_without_display = re.sub(display_pattern, '', text, flags=re.DOTALL)
-    inline_pattern = r'\$([^$]+)\$'
-    for match in re.finditer(inline_pattern, text_without_display):
-        equations.append({
-            'type': 'inline',
-            'content': match.group(1).strip(),
-            'full': f"${match.group(1)}$",
-            'start': match.start(),
-            'end': match.end()
-        })
-    
-    return equations
+    return []
 
 def render_latex_content(text: str) -> str:
-    """Rendu LaTeX simplifié et efficace"""
+    """Retourne le texte tel quel sans conversion LaTeX"""
     if not text:
         return ""
-    
-    try:
-        # Remplacer les crochets par des dollars pour les expressions mathématiques
-        text = re.sub(r'\[\s*(\\begin\{aligned\}.*?\\end\{aligned\})\s*\]', r'$$\1$$', text, flags=re.DOTALL)
-        text = re.sub(r'\[\s*([^\[\]]+)\s*\]', r'$$\1$$', text)
-        
-        # Corriger les accolades dans \in{...} vers \in \{...\}
-        text = re.sub(r'\\in\{([^}]+)\}', r'\\in \{\1\}', text)
-        
-        # Détecter et traiter le LaTeX
-        has_display_math = '$$' in text
-        has_inline_math = bool(re.search(r'(?<!\$)\$[^$]+\$(?!\$)', text))
-        
-        if has_display_math or has_inline_math:
-            def clean_display_math(match):
-                formula = match.group(1)
-                return f'<div class="math-container">$$\\displaystyle {formula}$$</div>'
-            
-            def clean_inline_math(match):
-                formula = match.group(1)
-                return f'<span class="math-inline">${formula}$</span>'
-            
-            text = re.sub(r'\$\$([^$]+?)\$\$', clean_display_math, text, flags=re.DOTALL)
-            text = re.sub(r'(?<!\$)\$([^$]+?)\$(?!\$)', clean_inline_math, text)
-            
-            return f'<div class="latex-content">{text}</div>'
-        
-        return text
-        
-    except Exception as e:
-        return text
+    return text
 
 def display_ai_response_with_latex(response: str, token_manager):
-    """Affiche la réponse de l'IA avec rendu LaTeX simplifié"""
+    """Affiche la réponse de l'IA sans conversion LaTeX"""
     try:
         if not response:
-            st.warning("Réponse vide reçée")
+            st.warning("Réponse vide reçue")
             return
         
         tokens_used = token_manager.count_tokens(response)
-        rendered_content = render_latex_content(response)
         
-        st.markdown(rendered_content, unsafe_allow_html=True)
-        
-        st.markdown("""
-        <script>
-        setTimeout(function() {
-            if (window.MathJax && window.MathJax.typesetPromise) {
-                window.MathJax.typesetPromise().catch((err) => console.log('MathJax error:', err.message));
-            }
-        }, 100);
-        </script>
-        """, unsafe_allow_html=True)
+        # Afficher le texte directement sans conversion LaTeX
+        st.markdown(response)
         
         with st.expander("ℹ️ Informations sur la réponse Cerebras", expanded=False):
             col1, col2 = st.columns(2)
