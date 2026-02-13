@@ -40,7 +40,7 @@ wheels/
 *.egg
 
 # Streamlit
-.streamlit/
+.streamlit/secrets.toml
 streamlit_secrets.toml
 
 # Database
