@@ -17,7 +17,7 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
-from langchain.chains import RetrievalQA
+
 from langchain.schema import Document as LangchainDocument
 from sentence_transformers import CrossEncoder
 import numpy as np
@@ -1682,20 +1682,20 @@ def safe_qa_call(db, query: str, language_prompt: str) -> str:
         st.error(f"Erreur lors de la requête QA avec Cerebras: {str(e)}")
         return "Désolé, je n'ai pas pu traiter votre demande en raison d'une erreur technique avec Cerebras."
 
-def initialize_qa_chain_with_limits(db):
-    """Initialise la chaîne de question-réponse avec gestion des limites Cerebras"""
-    llm = ChatCerebras(
-        model="gpt-oss-120b",
-        temperature=0.3,
-        max_tokens=TOKEN_LIMITS["max_tokens_per_request"]
-    )
+# def initialize_qa_chain_with_limits(db):
+#     """Initialise la chaîne de question-réponse avec gestion des limites Cerebras"""
+#     llm = ChatCerebras(
+#         model="gpt-oss-120b",
+#         temperature=0.3,
+#         max_tokens=TOKEN_LIMITS["max_tokens_per_request"]
+#     )
     
-    return RetrievalQA.from_chain_type(
-        llm=llm,
-        chain_type="stuff",
-        retriever=db.as_retriever(search_kwargs={"k": 3}),
-        return_source_documents=True
-    )
+#     return RetrievalQA.from_chain_type(
+#         llm=llm,
+#         chain_type="stuff",
+#         retriever=db.as_retriever(search_kwargs={"k": 3}),
+#         return_source_documents=True
+#     )
 
 def initialize_general_llm_with_limits():
     """Initialise le LLM pour le chat général avec gestion des limites Cerebras"""
