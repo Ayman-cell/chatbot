@@ -991,251 +991,254 @@ st.markdown("""
     box-sizing: border-box;
 }
 
-/* Background principal - Gradient moderne et élégant */
+/* Background principal - Style ChatGPT minimaliste */
 .stApp {
-    background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1629 100%);
-    color: #ffffff;
-    font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+    background: #ffffff !important;
+    color: #0d0d0d;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
 }
 
-/* En-tête principal - Style premium */
+/* En-tête principal - Épuré et classy */
 .main-header {
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
-    padding: 4rem 3rem;
-    border-radius: 20px;
-    margin-bottom: 3rem;
+    background: #ffffff;
+    padding: 3rem 2rem;
+    border-radius: 0;
+    margin-bottom: 2rem;
     text-align: center;
-    color: white;
-    box-shadow: 0 20px 60px rgba(139, 92, 246, 0.4), 0 0 40px rgba(236, 72, 153, 0.3);
-    position: relative;
-    overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #0d0d0d;
+    box-shadow: none;
+    border: none;
+    border-bottom: 1px solid #e5e5e5;
 }
 
 .main-header h1 {
-    font-size: 2.8rem !important;
-    font-weight: 800 !important;
-    margin-bottom: 1rem !important;
-    letter-spacing: -1px;
+    font-size: 2.5rem !important;
+    font-weight: 700 !important;
+    margin-bottom: 0.5rem !important;
+    letter-spacing: 0;
+    color: #0d0d0d !important;
 }
 
 .main-header p {
-    font-size: 1.1rem;
-    opacity: 0.9;
-    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    opacity: 0.6;
+    margin-bottom: 0;
+    color: #666666;
 }
 
-/* Sélecteur de mode - Design épuré */
+/* Sélecteur de mode - Design minimaliste */
 .mode-selector {
-    background: linear-gradient(135deg, rgba(30, 41, 82, 0.8) 0%, rgba(45, 60, 110, 0.8) 100%);
-    padding: 2.5rem;
-    border-radius: 20px;
-    margin-bottom: 2.5rem;
-    box-shadow: 0 10px 40px rgba(139, 92, 246, 0.15);
-    border: 1px solid rgba(139, 92, 246, 0.3);
-    backdrop-filter: blur(10px);
+    background: #f7f7f8;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e5e5;
+    backdrop-filter: none;
 }
 
 /* Carte des features */
 .feature-card {
-    background: linear-gradient(135deg, rgba(30, 41, 82, 0.9) 0%, rgba(45, 60, 110, 0.9) 100%);
-    padding: 2rem;
-    border-radius: 18px;
-    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.15);
-    border: 1px solid rgba(139, 92, 246, 0.3);
-    margin-bottom: 1.5rem;
-    color: #e0e7ff;
-    backdrop-filter: blur(10px);
-    transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+    background: #ffffff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e5e5;
+    margin-bottom: 1rem;
+    color: #0d0d0d;
+    backdrop-filter: none;
+    transition: all 0.2s ease;
 }
 
 .feature-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 50px rgba(139, 92, 246, 0.35);
-    border-color: rgba(236, 72, 153, 0.6);
+    transform: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-color: #d0d0d0;
 }
 
 .feature-card h4 {
-    color: #e879f9 !important;
-    margin-bottom: 1rem !important;
-    font-size: 1.2rem !important;
+    color: #0d0d0d !important;
+    margin-bottom: 0.5rem !important;
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
 }
 
-/* Boutons - Design moderne */
+/* Boutons - Design simple et épuré */
 .stButton > button {
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    padding: 0.8rem 2.5rem;
-    font-weight: 600;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    box-shadow: 0 10px 25px rgba(139, 92, 246, 0.35);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    background: #ffffff;
+    color: #0d0d0d;
+    border: 1px solid #d0d0d0;
+    border-radius: 6px;
+    padding: 0.7rem 2rem;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    backdrop-filter: none;
+    text-transform: none;
+    letter-spacing: 0;
 }
 
 .stButton > button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 15px 40px rgba(139, 92, 246, 0.45);
-    background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+    transform: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    background: #f7f7f8;
+    border-color: #0d0d0d;
 }
 
 .stButton > button:active {
-    transform: translateY(0px);
+    transform: none;
 }
 
-/* Messages de chat - Élégant */
+/* Messages de chat - Épuré */
 .stChatMessage {
-    background: linear-gradient(135deg, rgba(30, 41, 82, 0.95) 0%, rgba(45, 60, 110, 0.95) 100%) !important;
-    border-radius: 18px !important;
-    padding: 1.5rem !important;
-    margin-bottom: 1.5rem !important;
-    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.2) !important;
-    backdrop-filter: blur(20px) !important;
-    border: 1px solid rgba(139, 92, 246, 0.25) !important;
+    background: #ffffff !important;
+    border-radius: 6px !important;
+    padding: 1rem !important;
+    margin-bottom: 1rem !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+    backdrop-filter: none !important;
+    border: 1px solid #e5e5e5 !important;
     transition: all 0.2s ease !important;
 }
 
 .stChatMessage[data-testid="chat-message-user"] {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.9) 0%, rgba(139, 92, 246, 0.9) 100%) !important;
-    border: 1px solid rgba(139, 92, 246, 0.5) !important;
+    background: #f7f7f8 !important;
+    border: 1px solid #e5e5e5 !important;
     margin-left: 0 !important;
 }
 
 .stChatMessage[data-testid="chat-message-assistant"] {
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.85) 0%, rgba(236, 72, 153, 0.85) 100%) !important;
-    border: 1px solid rgba(236, 72, 153, 0.5) !important;
+    background: #ffffff !important;
+    border: 1px solid #e5e5e5 !important;
 }
 
 .stChatMessage .stMarkdown {
-    color: #ffffff !important;
-    font-size: 1rem !important;
-    line-height: 1.6 !important;
+    color: #0d0d0d !important;
+    font-size: 0.95rem !important;
+    line-height: 1.5 !important;
 }
 
 .stChatMessage .stMarkdown p {
-    color: #ffffff !important;
-    margin-bottom: 0.8rem !important;
+    color: #0d0d0d !important;
+    margin-bottom: 0.6rem !important;
 }
 
 /* Input de chat */
 .stChatInputContainer {
-    background: linear-gradient(135deg, rgba(30, 41, 82, 0.8) 0%, rgba(45, 60, 110, 0.8) 100%) !important;
-    border-radius: 15px !important;
-    border: 2px solid rgba(139, 92, 246, 0.4) !important;
-    padding: 0.8rem !important;
-    backdrop-filter: blur(20px) !important;
-    box-shadow: 0 10px 25px rgba(139, 92, 246, 0.15) !important;
-    transition: all 0.3s ease !important;
+    background: #ffffff !important;
+    border-radius: 6px !important;
+    border: 1px solid #d0d0d0 !important;
+    padding: 0.7rem !important;
+    backdrop-filter: none !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+    transition: all 0.2s ease !important;
 }
 
 .stChatInputContainer:focus-within {
-    border-color: rgba(236, 72, 153, 0.7) !important;
-    box-shadow: 0 15px 40px rgba(139, 92, 246, 0.3) !important;
+    border-color: #0d0d0d !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
 }
 
 .stChatInputContainer input {
-    color: #ffffff !important;
-    font-size: 1rem !important;
+    color: #0d0d0d !important;
+    font-size: 0.95rem !important;
     background: transparent !important;
-    font-weight: 500 !important;
+    font-weight: 400 !important;
 }
 
 .stChatInputContainer input::placeholder {
-    color: #8892b0 !important;
-    font-style: italic;
+    color: #999999 !important;
+    font-style: normal;
 }
 
 /* Sidebar */
 .stSidebar {
-    background: linear-gradient(180deg, rgba(15, 22, 41, 0.95) 0%, rgba(20, 29, 53, 0.95) 100%) !important;
+    background: #ffffff !important;
+    border-right: 1px solid #e5e5e5 !important;
 }
 
 .stSidebar .stMarkdown {
-    color: #e0e7ff;
+    color: #0d0d0d;
 }
 
 .stSidebar .stButton > button {
     width: 100%;
-    margin-bottom: 0.8rem;
+    margin-bottom: 0.5rem;
 }
 
 /* Selectbox */
 .stSelectbox > div > div {
-    background: rgba(30, 41, 82, 0.8) !important;
-    backdrop-filter: blur(15px) !important;
-    border: 1px solid rgba(139, 92, 246, 0.4) !important;
-    border-radius: 12px !important;
-    color: #ffffff !important;
+    background: #ffffff !important;
+    backdrop-filter: none !important;
+    border: 1px solid #d0d0d0 !important;
+    border-radius: 6px !important;
+    color: #0d0d0d !important;
 }
 
 .stSelectbox > div > div:hover {
-    border-color: rgba(236, 72, 153, 0.6) !important;
+    border-color: #0d0d0d !important;
 }
 
 /* File uploader */
 .stFileUploader > div {
-    background: rgba(30, 41, 82, 0.8) !important;
-    backdrop-filter: blur(15px) !important;
-    border: 2px dashed rgba(139, 92, 246, 0.5) !important;
-    border-radius: 15px !important;
-    transition: all 0.3s ease;
+    background: #f7f7f8 !important;
+    backdrop-filter: none !important;
+    border: 2px dashed #d0d0d0 !important;
+    border-radius: 8px !important;
+    transition: all 0.2s ease;
 }
 
 .stFileUploader > div:hover {
-    border-color: rgba(236, 72, 153, 0.8) !important;
-    background: rgba(139, 92, 246, 0.1) !important;
+    border-color: #0d0d0d !important;
+    background: #f0f0f0 !important;
 }
 
 /* Progress bar */
 .stProgress > div > div {
-    background: linear-gradient(90deg, #8b5cf6 0%, #ec4899 100%) !important;
-    border-radius: 10px !important;
+    background: #0d0d0d !important;
+    border-radius: 4px !important;
 }
 
 /* Expander */
 .streamlit-expanderHeader {
-    background: rgba(139, 92, 246, 0.1) !important;
-    border: 1px solid rgba(139, 92, 246, 0.3) !important;
-    border-radius: 10px !important;
-    color: #e0e7ff !important;
+    background: #f7f7f8 !important;
+    border: 1px solid #e5e5e5 !important;
+    border-radius: 6px !important;
+    color: #0d0d0d !important;
     transition: all 0.2s ease !important;
 }
 
 .streamlit-expanderHeader:hover {
-    border-color: rgba(236, 72, 153, 0.5) !important;
-    background: rgba(236, 72, 153, 0.05) !important;
+    border-color: #0d0d0d !important;
+    background: #f0f0f0 !important;
 }
 
 /* Scrollbar personnalisée */
 ::-webkit-scrollbar {
-    width: 10px;
+    width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-    background: rgba(30, 41, 82, 0.5);
-    border-radius: 10px;
+    background: #f7f7f8;
+    border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
-    border-radius: 10px;
-    border: 2px solid rgba(30, 41, 82, 0.5);
+    background: #ccc;
+    border-radius: 4px;
+    border: 2px solid #f7f7f8;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #ec4899 0%, #ec4899 100%);
+    background: #999;
 }
 
 /* Animations douces */
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(10px);
     }
     to {
         opacity: 1;
@@ -1250,29 +1253,29 @@ st.markdown("""
 /* Responsive */
 @media (max-width: 768px) {
     .main-header {
-        padding: 2.5rem 1.5rem;
+        padding: 1.5rem;
     }
     
     .main-header h1 {
-        font-size: 2rem !important;
+        font-size: 1.8rem !important;
     }
     
     .feature-card {
-        padding: 1.5rem;
+        padding: 1rem;
     }
 }
 
 /* Texte et typographie */
 h1, h2, h3, h4, h5, h6 {
-    color: #e0e7ff !important;
+    color: #0d0d0d !important;
 }
 
 /* Métrique */
 .stMetric {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+    background: #f7f7f8;
     padding: 1.5rem;
-    border-radius: 12px;
-    border: 1px solid rgba(99, 102, 241, 0.2);
+    border-radius: 8px;
+    border: 1px solid #e5e5e5;
 }
 
 </style>
