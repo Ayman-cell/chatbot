@@ -1702,6 +1702,12 @@ def render_latex_content(text: str) -> str:
     """Convertit et améliore les délimiteurs LaTeX pour meilleur rendu MathJax"""
     if not text:
         return ""
+
+    def _looks_like_math(expr: str) -> bool:
+        return bool(re.search(
+            r'\\[a-zA-Z]+|[_^]|=|\\frac|\\sum|\\arg|\\theta|\\phi|\\omega|\\begin\{|\\end\{|\d+\s*[\+\-\*/]\s*\d+',
+            expr
+        ))
     
     # Étape 1: Normaliser uniquement les délimiteurs display cassés de type [ \ ... ]
     # Exemple: "[ \n ... ]" -> "\[\n...\n\]"
@@ -1713,6 +1719,21 @@ def render_latex_content(text: str) -> str:
     text = re.sub(
         r'(?m)^\s*\]\s*$',
         r'\\]',
+        text
+    )
+
+    # Étape 1b: Convertir les lignes "[ ... ]" en bloc LaTeX si le contenu est mathématique
+    def _line_bracket_to_display(match):
+        inner = match.group(1).strip()
+        if _looks_like_math(inner):
+            inner = re.sub(r'^\s*\\\[\s*', '', inner)
+            inner = re.sub(r'\s*\\\]\s*$', '', inner)
+            return f"\\[\n{inner}\n\\]"
+        return match.group(0)
+
+    text = re.sub(
+        r'(?m)^\s*\[(.+?)\]\s*$',
+        _line_bracket_to_display,
         text
     )
     
@@ -1743,8 +1764,8 @@ def render_latex_content(text: str) -> str:
     # Étape 7: Éviter les espaces accidentels dans les délimiteurs
     text = re.sub(r'\$\s+', '$', text)
     text = re.sub(r'\s+\$', '$', text)
-    text = re.sub(r'\\\[\s+', '\\\[', text)
-    text = re.sub(r'\s+\\\]', '\\\]', text)
+    text = re.sub(r'\\\[\s+', r'\\[', text)
+    text = re.sub(r'\s+\\\]', r'\\]', text)
     
     # Étape 8: Nettoyer les caractères spéciaux corrompus
     # Remplacer les virgules qui ne devraient pas être là (ex: 1,ms → 1.\text{ms})
@@ -1771,6 +1792,9 @@ def render_latex_content(text: str) -> str:
     text = re.sub(r'\\mathbf\{H\},\\mathbf\{u\}_i', r'\\mathbf{H}\\,\\mathbf{u}_i', text)
     text = re.sub(r'\\omega_z\\\s*v_R', r'\\omega_z \\\\ v_R', text)
     text = re.sub(r'\\\]\s*,\s*\\\[\s*', r'\\]\n\n\\[', text)
+    text = re.sub(r'\\operatorname\{atan2\}!\s*\(', r'\\operatorname{atan2}(', text)
+    text = re.sub(r'\\boxed\{\s*;\s*', r'\\boxed{', text)
+    text = re.sub(r';\s*\}', r'}', text)
     
     return text.strip()
 
