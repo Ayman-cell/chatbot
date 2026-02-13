@@ -14,14 +14,11 @@ import statistics
 from dataclasses import dataclass, asdict
 from langchain_cerebras import ChatCerebras
 from langchain_community.document_loaders import PyPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain.chains import RetrievalQA
-try:
-    from langchain.schema import Document as LangchainDocument
-except ImportError:
-    from langchain_core.documents import Document as LangchainDocument
+from langchain_core.documents import Document as LangchainDocument
 from sentence_transformers import CrossEncoder
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
