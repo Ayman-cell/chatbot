@@ -1703,29 +1703,74 @@ def render_latex_content(text: str) -> str:
     if not text:
         return ""
     
-    # Étape 1: Envelopper les environnements \begin{...}\end{...} dans \[ ... \]
-    # pour assurer qu'ils sont reconnus comme display math
+    # Étape 1: Normaliser uniquement les délimiteurs display cassés de type [ \ ... ]
+    # Exemple: "[ \n ... ]" -> "\[\n...\n\]"
     text = re.sub(
-        r'(?<!\[)\\begin\{(aligned|equation|eqnarray|align|gather|multline|flalign|alignat)\}(.*?)\\end\{\1\}(?!\])',
+        r'(?m)^\s*\[\s*\\?\s*$',
+        r'\\[',
+        text
+    )
+    text = re.sub(
+        r'(?m)^\s*\]\s*$',
+        r'\\]',
+        text
+    )
+    
+    # Étape 2: Nettoyer les structures mal formées
+    # Supprimer les \\ orphelins au début ou fin
+    text = re.sub(r'^\\\\\s+', '', text, flags=re.MULTILINE)
+    text = re.sub(r'\s+\\\\$', '', text, flags=re.MULTILINE)
+    
+    # Étape 3: Envelopper les environnements \begin{...}\end{...} dans \[ ... \]
+    text = re.sub(
+        r'(?<!\[)\\begin\{(aligned|equation|eqnarray|align|gather|multline|flalign|alignat|cases|array|matrix|pmatrix|bmatrix|vmatrix|Vmatrix)\}(.*?)\\end\{\1\}(?!\])',
         r'\\\[\n\\begin{\1}\2\\end{\1}\n\\\]',
         text,
         flags=re.DOTALL
     )
     
-    # Étape 2: Normaliser les délimiteurs LaTeX inline
+    # Étape 4: Normaliser les délimiteurs LaTeX inline
     # \(...\) → $...$
     text = re.sub(r'\\\((.*?)\\\)', r'$\1$', text, flags=re.DOTALL)
     
-    # Étape 3: Espaces autour des délimiteurs display pour lisibilité
+    # Étape 5: Nettoyer les espaces autour des délimiteurs display
     text = re.sub(r'(\S)\\\[', r'\1\n\n\\\[', text)  # Nouveau ligne avant
     text = re.sub(r'\\\](\S)', r'\\\]\n\n\1', text)  # Nouveau ligne après
     
-    # Étape 4: Nettoyer les multiples espaces et retours à la ligne
+    # Étape 6: Nettoyer les multiples lignes blanches
     text = re.sub(r'\n\n\n+', r'\n\n', text)
     
-    # Étape 5: Éviter les espaces accidentels dans les délimiteurs
+    # Étape 7: Éviter les espaces accidentels dans les délimiteurs
     text = re.sub(r'\$\s+', '$', text)
     text = re.sub(r'\s+\$', '$', text)
+    text = re.sub(r'\\\[\s+', '\\\[', text)
+    text = re.sub(r'\s+\\\]', '\\\]', text)
+    
+    # Étape 8: Nettoyer les caractères spéciaux corrompus
+    # Remplacer les virgules qui ne devraient pas être là (ex: 1,ms → 1.\text{ms})
+    text = re.sub(r'(\d),(\s*\\text)', r'\1.\2', text)
+    # Nettoyer les \bigl ( avec espace → \bigl(
+    text = re.sub(r'\\bigl\s+\(', r'\\bigl(', text)
+    text = re.sub(r'\\bigr\s+\)', r'\\bigr)', text)
+    # Nettoyer les \bigl[ avec espace
+    text = re.sub(r'\\bigl\s+\[', r'\\bigl[', text)
+    text = re.sub(r'\\bigr\s+\]', r'\\bigr]', text)
+    
+    # Étape 9: Nettoyer les points d'exclamation bizarres avant les parenthèses
+    text = re.sub(r'!\s*\(', '(', text)
+    text = re.sub(r'!\s*\[', '[', text)
+    
+    # Étape 10: Nettoyer les points-virgules bizarres
+    text = re.sub(r';\s*\\', r'\\', text)
+    
+    # Étape 11: Nettoyer les virgules dans les fonctions (ex: atan2(y,,x) → atan2(y,x))
+    text = re.sub(r',(\s*,)', ',', text)
+
+    # Étape 12: Corriger quelques artefacts fréquents du modèle dans les formules
+    text = re.sub(r'\\arg\\min_\\mathbf\{H\}', r'\\arg\\min_{\\mathbf{H}}', text)
+    text = re.sub(r'\\mathbf\{H\},\\mathbf\{u\}_i', r'\\mathbf{H}\\,\\mathbf{u}_i', text)
+    text = re.sub(r'\\omega_z\\\s*v_R', r'\\omega_z \\\\ v_R', text)
+    text = re.sub(r'\\\]\s*,\s*\\\[\s*', r'\\]\n\n\\[', text)
     
     return text.strip()
 
