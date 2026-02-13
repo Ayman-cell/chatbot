@@ -1,3 +1,18 @@
+[server]
+headless = true
+enableCORS = false
+port = 8080
+maxUploadSize = 200
+
+[theme]
+base = "light"
+primaryColor = "#0E4A86"
+backgroundColor = "#F5F7FA"
+secondaryBackgroundColor = "#FFFFFF"
+textColor = "#0F172A"
+
+[global]
+hideTopBar = false
 [theme]
 primaryColor = "#FF6B6B"
 backgroundColor = "#0E1117"

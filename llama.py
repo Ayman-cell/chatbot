@@ -38,7 +38,21 @@ if not os.path.exists(CONVERSATIONS_DIR):
     os.makedirs(CONVERSATIONS_DIR)
 
 # Configuration de l'API Cerebras
-CEREBRAS_API_KEY = "csk-phdt3299268dpcdx9efnpydcjxj66vnp42yjh63mc2k6eh6n"
+try:
+    # Prefer Streamlit secrets (set in Streamlit Cloud UI)
+    CEREBRAS_API_KEY = st.secrets.get("CEREBRAS_API_KEY")
+except Exception:
+    CEREBRAS_API_KEY = None
+
+# Fallback to environment variable if secrets not set
+if not CEREBRAS_API_KEY:
+    CEREBRAS_API_KEY = os.environ.get("CEREBRAS_API_KEY")
+
+if not CEREBRAS_API_KEY:
+    st.error("❌ CEREBRAS_API_KEY introuvable. Ajoutez-la dans Settings → Secrets (Streamlit Cloud) ou définissez la variable d'environnement CEREBRAS_API_KEY.")
+    st.info("Instructions: Settings → Secrets → Add: CEREBRAS_API_KEY = \"votre-clé\"")
+    st.stop()
+
 os.environ["CEREBRAS_API_KEY"] = CEREBRAS_API_KEY
 
 # Configuration des limites de tokens pour Llama 3.1-8B sur Cerebras
