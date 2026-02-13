@@ -1006,10 +1006,10 @@ st.markdown("""
     margin-bottom: 3rem;
     text-align: center;
     color: white;
-    box-shadow: 0 20px 60px rgba(99, 102, 241, 0.4), 0 0 40px rgba(236, 72, 153, 0.2);
+    box-shadow: 0 20px 60px rgba(139, 92, 246, 0.4), 0 0 40px rgba(236, 72, 153, 0.3);
     position: relative;
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .main-header h1 {
@@ -1031,8 +1031,8 @@ st.markdown("""
     padding: 2.5rem;
     border-radius: 20px;
     margin-bottom: 2.5rem;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(99, 102, 241, 0.2);
+    box-shadow: 0 10px 40px rgba(139, 92, 246, 0.15);
+    border: 1px solid rgba(139, 92, 246, 0.3);
     backdrop-filter: blur(10px);
 }
 
@@ -1041,8 +1041,8 @@ st.markdown("""
     background: linear-gradient(135deg, rgba(30, 41, 82, 0.9) 0%, rgba(45, 60, 110, 0.9) 100%);
     padding: 2rem;
     border-radius: 18px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(99, 102, 241, 0.2);
+    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.15);
+    border: 1px solid rgba(139, 92, 246, 0.3);
     margin-bottom: 1.5rem;
     color: #e0e7ff;
     backdrop-filter: blur(10px);
@@ -1051,8 +1051,8 @@ st.markdown("""
 
 .feature-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 20px 50px rgba(99, 102, 241, 0.3);
-    border-color: rgba(99, 102, 241, 0.5);
+    box-shadow: 0 20px 50px rgba(139, 92, 246, 0.35);
+    border-color: rgba(236, 72, 153, 0.6);
 }
 
 .feature-card h4 {
@@ -1071,7 +1071,7 @@ st.markdown("""
     font-weight: 600;
     font-size: 1rem;
     transition: all 0.3s ease;
-    box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 10px 25px rgba(139, 92, 246, 0.35);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     text-transform: uppercase;
@@ -1080,7 +1080,7 @@ st.markdown("""
 
 .stButton > button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 15px 40px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 15px 40px rgba(139, 92, 246, 0.45);
     background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
 }
 
@@ -1094,21 +1094,21 @@ st.markdown("""
     border-radius: 18px !important;
     padding: 1.5rem !important;
     margin-bottom: 1.5rem !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.2) !important;
     backdrop-filter: blur(20px) !important;
-    border: 1px solid rgba(99, 102, 241, 0.2) !important;
+    border: 1px solid rgba(139, 92, 246, 0.25) !important;
     transition: all 0.2s ease !important;
 }
 
 .stChatMessage[data-testid="chat-message-user"] {
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.9) 0%, rgba(139, 92, 246, 0.9) 100%) !important;
-    border: 1px solid rgba(236, 72, 153, 0.3) !important;
+    border: 1px solid rgba(139, 92, 246, 0.5) !important;
     margin-left: 0 !important;
 }
 
 .stChatMessage[data-testid="chat-message-assistant"] {
-    background: linear-gradient(135deg, rgba(30, 144, 255, 0.85) 0%, rgba(0, 191, 255, 0.85) 100%) !important;
-    border: 1px solid rgba(0, 191, 255, 0.3) !important;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.85) 0%, rgba(236, 72, 153, 0.85) 100%) !important;
+    border: 1px solid rgba(236, 72, 153, 0.5) !important;
 }
 
 .stChatMessage .stMarkdown {
@@ -1126,16 +1126,16 @@ st.markdown("""
 .stChatInputContainer {
     background: linear-gradient(135deg, rgba(30, 41, 82, 0.8) 0%, rgba(45, 60, 110, 0.8) 100%) !important;
     border-radius: 15px !important;
-    border: 2px solid rgba(99, 102, 241, 0.3) !important;
+    border: 2px solid rgba(139, 92, 246, 0.4) !important;
     padding: 0.8rem !important;
     backdrop-filter: blur(20px) !important;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+    box-shadow: 0 10px 25px rgba(139, 92, 246, 0.15) !important;
     transition: all 0.3s ease !important;
 }
 
 .stChatInputContainer:focus-within {
-    border-color: rgba(99, 102, 241, 0.6) !important;
-    box-shadow: 0 15px 40px rgba(99, 102, 241, 0.3) !important;
+    border-color: rgba(236, 72, 153, 0.7) !important;
+    box-shadow: 0 15px 40px rgba(139, 92, 246, 0.3) !important;
 }
 
 .stChatInputContainer input {
@@ -1168,37 +1168,47 @@ st.markdown("""
 .stSelectbox > div > div {
     background: rgba(30, 41, 82, 0.8) !important;
     backdrop-filter: blur(15px) !important;
-    border: 1px solid rgba(99, 102, 241, 0.3) !important;
+    border: 1px solid rgba(139, 92, 246, 0.4) !important;
     border-radius: 12px !important;
     color: #ffffff !important;
+}
+
+.stSelectbox > div > div:hover {
+    border-color: rgba(236, 72, 153, 0.6) !important;
 }
 
 /* File uploader */
 .stFileUploader > div {
     background: rgba(30, 41, 82, 0.8) !important;
     backdrop-filter: blur(15px) !important;
-    border: 2px dashed rgba(99, 102, 241, 0.5) !important;
+    border: 2px dashed rgba(139, 92, 246, 0.5) !important;
     border-radius: 15px !important;
     transition: all 0.3s ease;
 }
 
 .stFileUploader > div:hover {
-    border-color: rgba(139, 92, 246, 0.8) !important;
-    background: rgba(99, 102, 241, 0.1) !important;
+    border-color: rgba(236, 72, 153, 0.8) !important;
+    background: rgba(139, 92, 246, 0.1) !important;
 }
 
 /* Progress bar */
 .stProgress > div > div {
-    background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%) !important;
+    background: linear-gradient(90deg, #8b5cf6 0%, #ec4899 100%) !important;
     border-radius: 10px !important;
 }
 
 /* Expander */
 .streamlit-expanderHeader {
-    background: rgba(99, 102, 241, 0.1) !important;
-    border: 1px solid rgba(99, 102, 241, 0.2) !important;
+    background: rgba(139, 92, 246, 0.1) !important;
+    border: 1px solid rgba(139, 92, 246, 0.3) !important;
     border-radius: 10px !important;
     color: #e0e7ff !important;
+    transition: all 0.2s ease !important;
+}
+
+.streamlit-expanderHeader:hover {
+    border-color: rgba(236, 72, 153, 0.5) !important;
+    background: rgba(236, 72, 153, 0.05) !important;
 }
 
 /* Scrollbar personnalisée */
@@ -1212,13 +1222,13 @@ st.markdown("""
 }
 
 ::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
     border-radius: 10px;
     border: 2px solid rgba(30, 41, 82, 0.5);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+    background: linear-gradient(135deg, #ec4899 0%, #ec4899 100%);
 }
 
 /* Animations douces */
