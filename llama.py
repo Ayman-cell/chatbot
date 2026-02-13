@@ -14,7 +14,7 @@ import statistics
 from dataclasses import dataclass, asdict
 from langchain_cerebras import ChatCerebras
 from langchain_community.document_loaders import PyPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain.schema import Document as LangchainDocument
