@@ -1033,17 +1033,22 @@ def add_latex_css():
     </style>
     """, unsafe_allow_html=True)
 
-# Configuration MathJax pour le rendu LaTeX
+# Configuration MathJax pour le rendu LaTeX robuste et fiable
 st.markdown("""
 <script>
-  window.MathJax = {
+  MathJax = {
     tex: {
-      inlineMath: [['$', '$']],
-      displayMath: [['$$', '$$']],
-      processEscapes: true
+      inlineMath: [['$', '$'], ['\\\\(', '\\\\)']],
+      displayMath: [['$$', '$$'], ['\\\\[', '\\\\]']],
+      processEscapes: true,
+      processEnvironments: true
     },
     svg: {
-      fontCache: 'global'
+      fontCache: 'global',
+      scale: 1
+    },
+    startup: {
+      typeset: true
     }
   };
 </script>
@@ -1348,33 +1353,51 @@ h1, h2, h3, h4, h5, h6 {
     border: 1px solid #e5e5e5;
 }
 
-/* Styles pour le rendu LaTeX/MathJax */
+/* Styles pour le rendu LaTeX/MathJax - Optimisé pour tous les délimiteurs */
 .katex-html,
 .MathJax_Display,
-.mjx-chtml {
+.mjx-chtml,
+.MathJax {
     color: #0d0d0d !important;
+    font-size: inherit;
 }
 
-/* Conteneur des équations */
-.stMarkdown code.language-latex,
+/* Conteneurs des équations display (avec \[ \] ou $$ $$) */
 .stMarkdown .katex-display,
+.stMarkdown .MathJax_Display,
+.stMarkdown .mjx-chtml[display="true"],
 p:has(> .katex-display) {
     background: #f7f7f8 !important;
-    padding: 1rem !important;
+    padding: 1.2rem !important;
     border-radius: 8px !important;
-    border-left: 3px solid #d0d0d0 !important;
-    margin: 1rem 0 !important;
+    border-left: 4px solid #d0d0d0 !important;
+    margin: 1.2rem 0 !important;
     overflow-x: auto;
+    display: block !important;
 }
 
-/* Équations inline */
-.stMarkdown .katex {
+/* Équations inline (avec $ $ ou \( \)) */
+.stMarkdown .katex,
+.stMarkdown .MathJax,
+.stMarkdown .mjx-chtml[display="false"] {
     font-size: 1.05em;
+    display: inline;
 }
 
 /* Améliorations typographiques pour LaTeX */
 .stMarkdown {
     line-height: 1.65;
+}
+
+/* Support pour tous les types MathJax */
+.mjx-math {
+    color: #0d0d0d !important;
+}
+
+/* Scrolling horizontal pour équations complexes */
+.stMarkdown pre:has(.katex) {
+    overflow-x: auto;
+    max-width: 100%;
 }
 
 </style>
@@ -1614,19 +1637,28 @@ def extract_latex_equations(text: str):
     return equations
 
 def render_latex_content(text: str) -> str:
-    """Convertit les délimiteurs LaTeX pour Streamlit avec meilleur rendu"""
+    """Convertit et améliore les délimiteurs LaTeX pour meilleur rendu MathJax"""
     if not text:
         return ""
     
-    # Convertir [ ... ] en $$ ... $$ (Streamlit utilise $$)
-    # Ajouter des espaces autour pour bien séparer du texte
-    text = re.sub(r'\\\[(.*?)\\\]', r'\n$$\1$$\n', text, flags=re.DOTALL)
+    # Étape 1: Normaliser les délimiteurs LaTeX display (priorité haute)
+    # \[ ... \] → \[ ... \] (garder tel quel, MathJax le supporte)
     
-    # Nettoyer les espaces excessifs tout en gardant les retours à la ligne
-    text = re.sub(r'\n\s*\n+', r'\n\n', text)  # Nettoyer les lignes blanches excessives
+    # Étape 2: Normaliser les délimiteurs LaTeX inline
+    # \(...\) → $...$  (convertir en format universellement supporté)
+    text = re.sub(r'\\\((.*?)\\\)', r'$\1$', text, flags=re.DOTALL)
     
-    # Ajouter des espaces avant/après les équations inline $ ... $
-    text = re.sub(r'(?<!\$)\$(?!\$)([^\$]+)(?<!\$)\$(?!\$)', r' $\1$ ', text)
+    # Étape 3: Ajouter espaces autour des équations display pour lisibilité
+    # \[ ... \] avec espaces autour
+    text = re.sub(r'(\S)\\\[', r'\1 \\\[', text)  # Espace avant
+    text = re.sub(r'\\\](\S)', r'\\\] \1', text)  # Espace après
+    
+    # Étape 4: Nettoyer les multiples espaces et retours à la ligne
+    text = re.sub(r'\n\s*\n+', r'\n\n', text)
+    
+    # Étape 5: Éviter les espaces accidentels dans les délimiteurs
+    text = re.sub(r'\$\s+', '$', text)
+    text = re.sub(r'\s+\$', '$', text)
     
     return text.strip()
 
