@@ -1,100 +1,78 @@
 # Core Framework
-streamlit==1.32.0
-streamlit-extras==0.3.6
+streamlit>=1.28.0
+streamlit-extras>=0.3.0
 
-# LangChain & LLM
-langchain==0.1.13
-langchain-core==0.1.33
-langchain-community==0.0.27
-langchain-text-splitters==0.0.1
-langchain-cerebras==0.1.4
+# LangChain & LLM - Latest compatible versions
+langchain>=0.1.0
+langchain-core>=0.1.0
+langchain-community>=0.0.20
+langchain-cerebras>=0.6.0
 
 # API & HTTP
-requests==2.31.0
-urllib3==2.0.7
+requests>=2.31.0
+urllib3>=2.0.7
 
-# Data Processing
-pandas==2.1.3
-numpy==1.26.3
-scipy==1.11.4
-openpyxl==3.1.2
-python-docx==0.8.11
+# Data Processing & Math
+pandas>=2.0.0
+numpy>=1.24.0
+scipy>=1.10.0
+python-dateutil>=2.8.2
 
-# Document Processing
-pypdf==3.17.1
-pdf2image==1.16.3
-python-pptx==0.6.21
-python-docx==0.8.11
+# Excel & Office Documents
+openpyxl>=3.1.0
+python-docx>=0.8.10
+python-pptx>=0.6.21
 
-# Embeddings & Vector Stores
-sentence-transformers==2.2.2
-faiss-cpu==1.7.4
-scikit-learn==1.3.2
+# PDF Processing
+pypdf>=3.17.0
+pdf2image>=1.16.0
 
-# NLP & Text Processing
-transformers==4.35.2
-tokenizers==0.15.0
-tiktoken==0.5.2
+# Embeddings & Vector Stores (with CPU support)
+sentence-transformers>=2.2.0
+faiss-cpu>=1.7.4
+scikit-learn>=1.3.0
+
+# NLP & Tokenization
+transformers>=4.30.0
+tokenizers>=0.13.0
+tiktoken>=0.5.0
 
 # Deep Learning
-torch==2.1.1
-torchvision==0.16.1
-torchaudio==2.1.1
+torch>=2.0.0,<2.2.0
+torchvision>=0.15.0
+torchaudio>=2.0.0
 
-# ML & Data Science
-scikit-learn==1.3.2
-scikit-optimize==0.9.2
+# ML & Optimization
+scikit-optimize>=0.9.0
 
-# HuggingFace Tools
-huggingface-hub==0.19.3
-huggingface_hub==0.19.3
+# HuggingFace Integration
+huggingface-hub>=0.17.0
 
-# Environment & Config
-python-dotenv==1.0.0
-python-multipart==0.0.6
-
-# Database & Caching
-sqlalchemy==2.0.23
-redis==5.0.1
-
-# Utilities
-uuid6==1.0.3
-pydantic==2.5.1
-pydantic-core==2.14.3
-typing-extensions==4.8.0
-
-# Logging & Monitoring
-python-json-logger==2.0.7
-colorlog==6.8.0
-
-# Date & Time
-python-dateutil==2.8.2
-pytz==2023.3
+# Configuration & Environment
+python-dotenv>=1.0.0
+pydantic>=2.0.0
+typing-extensions>=4.8.0
 
 # JSON & Serialization
-jsonschema==4.20.0
-orjson==3.9.10
+jsonschema>=4.20.0
+orjson>=3.9.0
 
-# System & OS
-psutil==5.9.6
-pathlib2==2.3.7.post1
+# Utilities
+chardet>=5.2.0
+certifi>=2023.7.0
+idna>=3.6
+charset-normalizer>=3.3.0
+
+# Logging & Monitoring
+colorlog>=6.8.0
+python-json-logger>=2.0.0
+
+# System & Performance
+psutil>=5.9.0
+pytz>=2023.3
 
 # Security
-cryptography==41.0.7
+cryptography>=41.0.0
 
-# Additional Dependencies
-chardet==5.2.0
-certifi==2023.7.22
-idna==3.6
-
-# Encoding & Compression
-charset-normalizer==3.3.2
-py-zipfile==0.2.0
-
-# Performance Optimization
-cython==3.0.6
-numba==0.58.1
-
-# Code Quality
-pylint==3.0.3
-black==23.12.1
+# Additional performance
+cython>=0.29.0
