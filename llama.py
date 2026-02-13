@@ -943,10 +943,6 @@ def load_conversation(conversation_id):
     except Exception as e:
         st.error(f"Erreur lors du chargement: {str(e)}")
         return None
-            return json.load(f)
-    except Exception as e:
-        st.error(f"Erreur lors du chargement de la conversation: {e}")
-        return None
 
 def delete_conversation(conversation_id):
     """Supprime une conversation"""
