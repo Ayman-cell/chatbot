@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: chatbot-aymaan
+    runtime: python
+    runtimeVersion: 3.11
+    buildCommand: pip install -r requirements.txt
+    startCommand: streamlit run llama.py --server.port=10000 --server.address=0.0.0.0
+    envVars:
+      - key: CEREBRAS_API_KEY
+        value: csk-wcmnmtnhn9d5hdx25mkmy2h3k4cyj6kdx9fd9v4emd8545xd
