@@ -1,0 +1,21 @@
+{
+  "id": "70d157b7-917f-4d35-9500-91d750967f2b",
+  "title": "Désolé, je nai pas pu",
+  "mode": "general_chat",
+  "timestamp": "2026-02-13T21:33:07.449185",
+  "messages": [
+    {
+      "role": "assistant",
+      "content": "Bonjour! Je suis votre assistant IA alimenté par Cerebras Llama 3.1-8B avec rendu LaTeX intégré. Posez-moi n'importe quelle question dans votre langue préférée!"
+    },
+    {
+      "role": "user",
+      "content": "Bonjour expliquer moi cest quoi ai agent merci"
+    },
+    {
+      "role": "assistant",
+      "content": "Désolé, je n'ai pas pu traiter votre demande en raison de limitations techniques avec Cerebras."
+    }
+  ],
+  "message_count": 3
+}

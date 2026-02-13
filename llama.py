@@ -14,11 +14,11 @@ import statistics
 from dataclasses import dataclass, asdict
 from langchain_cerebras import ChatCerebras
 from langchain_community.document_loaders import PyPDFLoader
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
-from langchain_community.chains import RetrievalQA
-from langchain_core.documents import Document as LangchainDocument
+from langchain.chains import RetrievalQA
+from langchain.schema import Document as LangchainDocument
 from sentence_transformers import CrossEncoder
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -38,21 +38,7 @@ if not os.path.exists(CONVERSATIONS_DIR):
     os.makedirs(CONVERSATIONS_DIR)
 
 # Configuration de l'API Cerebras
-try:
-    # Prefer Streamlit secrets (set in Streamlit Cloud UI)
-    CEREBRAS_API_KEY = "csk-phdt3299268dpcdx9efnpydcjxj66vnp42yjh63mc2k6eh6n"
-except Exception:
-    CEREBRAS_API_KEY = None
-
-# Fallback to environment variable if secrets not set
-if not CEREBRAS_API_KEY:
-    CEREBRAS_API_KEY = os.environ.get("CEREBRAS_API_KEY")
-
-if not CEREBRAS_API_KEY:
-    st.error("❌ CEREBRAS_API_KEY introuvable. Ajoutez-la dans Settings → Secrets (Streamlit Cloud) ou définissez la variable d'environnement CEREBRAS_API_KEY.")
-    st.info("Instructions: Settings → Secrets → Add: CEREBRAS_API_KEY = \"votre-clé\"")
-    st.stop()
-
+CEREBRAS_API_KEY = "csk-phdt3299268dpcdx9efnpydcjxj66vnp42yjh63mc2k6eh6n"
 os.environ["CEREBRAS_API_KEY"] = CEREBRAS_API_KEY
 
 # Configuration des limites de tokens pour Llama 3.1-8B sur Cerebras
