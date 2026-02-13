@@ -982,6 +982,25 @@ def add_latex_css():
     </style>
     """, unsafe_allow_html=True)
 
+# Configuration MathJax pour le rendu LaTeX
+st.markdown("""
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$']],
+      displayMath: [['$$', '$$']],
+      processEscapes: true
+    },
+    svg: {
+      fontCache: 'global'
+    }
+  };
+</script>
+<script type="text/javascript" id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+""", unsafe_allow_html=True)
+
 # Styles CSS modernes - Design magnifique et simple
 st.markdown("""
 <style>
@@ -1278,6 +1297,35 @@ h1, h2, h3, h4, h5, h6 {
     border: 1px solid #e5e5e5;
 }
 
+/* Styles pour le rendu LaTeX/MathJax */
+.katex-html,
+.MathJax_Display,
+.mjx-chtml {
+    color: #0d0d0d !important;
+}
+
+/* Conteneur des équations */
+.stMarkdown code.language-latex,
+.stMarkdown .katex-display,
+p:has(> .katex-display) {
+    background: #f7f7f8 !important;
+    padding: 1rem !important;
+    border-radius: 8px !important;
+    border-left: 3px solid #d0d0d0 !important;
+    margin: 1rem 0 !important;
+    overflow-x: auto;
+}
+
+/* Équations inline */
+.stMarkdown .katex {
+    font-size: 1.05em;
+}
+
+/* Améliorations typographiques pour LaTeX */
+.stMarkdown {
+    line-height: 1.65;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -1515,18 +1563,21 @@ def extract_latex_equations(text: str):
     return equations
 
 def render_latex_content(text: str) -> str:
-    """Convertit les délimiteurs LaTeX pour Streamlit"""
+    """Convertit les délimiteurs LaTeX pour Streamlit avec meilleur rendu"""
     if not text:
         return ""
     
     # Convertir [ ... ] en $$ ... $$ (Streamlit utilise $$)
-    text = re.sub(r'\\\[(.*?)\\\]', r'$$\1$$', text, flags=re.DOTALL)
+    # Ajouter des espaces autour pour bien séparer du texte
+    text = re.sub(r'\\\[(.*?)\\\]', r'\n$$\1$$\n', text, flags=re.DOTALL)
     
-    # Nettoyer les espaces excessifs autour des équations
-    text = re.sub(r'\$\$\s+', '$$', text)
-    text = re.sub(r'\s+\$\$', '$$', text)
+    # Nettoyer les espaces excessifs tout en gardant les retours à la ligne
+    text = re.sub(r'\n\s*\n+', r'\n\n', text)  # Nettoyer les lignes blanches excessives
     
-    return text
+    # Ajouter des espaces avant/après les équations inline $ ... $
+    text = re.sub(r'(?<!\$)\$(?!\$)([^\$]+)(?<!\$)\$(?!\$)', r' $\1$ ', text)
+    
+    return text.strip()
 
 def display_ai_response_with_latex(response: str, token_manager):
     """Affiche la réponse de l'IA avec support LaTeX via Markdown"""
