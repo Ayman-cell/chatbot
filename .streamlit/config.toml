@@ -25,6 +25,3 @@ gatherUsageStats = false
 [runner]
 magicEnabled = true
 fastReruns = true
-
-[mapbox]
-token = ""

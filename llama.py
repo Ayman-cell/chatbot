@@ -73,7 +73,7 @@ RAG_CONFIG = {
     "code_heavy": {
         "chunk_size": 720,  # Augmenté de 600 à 720 (+20%)
         "chunk_overlap": 150,  # Augmenté de 100 à 150 (+50%)
-        "separators": ["\n\n", "\n\`\`\`", "\nclass", "\ndef", "\nimport", " "]
+        "separators": ["\n\n", "\n```", "\nclass", "\ndef", "\nimport", " "]
     }
 }
 
@@ -977,8 +977,8 @@ def add_latex_css():
     <script>
     window.MathJax = {
         tex: {
-            inlineMath: [['$', '$'], ['\$$', '\$$']],
-            displayMath: [['$$', '$$'], ['\\[', '\\]']],
+            inlineMath: [['$', '$'], ['\\$\\$', '\\$\\$']],
+            displayMath: [['$$', '$$'], ['\\\\[', '\\\\]']],
             processEscapes: true,
             processEnvironments: true,
             macros: {
