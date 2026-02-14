@@ -2,6 +2,8 @@
 
 **Un chatbot intelligent et multilingue basé sur l'IA générative avec récupération de documents (RAG) avancée**
 
+🚀 **[Essayer l'application en ligne](https://chatbot-aymaan.streamlit.app/)**
+
 ---
 
 ## 📋 Vue d'ensemble
@@ -354,9 +356,8 @@ Ce projet est sous licence **MIT** - voir le fichier [LICENSE](LICENSE) pour plu
 ## 👨‍💻 Auteur
 
 **Ayman**
-- 📧 Email : [votre-email@example.com]
-- 🐙 GitHub : [@aymen-cell](https://github.com/yourusername)
-- 💼 LinkedIn : [Votre profil LinkedIn]
+- � GitHub : [@aymen-cell](https://github.com/aymen-cell)
+- 🚀 Application déployée : [https://chatbot-aymaan.streamlit.app/](https://chatbot-aymaan.streamlit.app/)
 
 ---
 
