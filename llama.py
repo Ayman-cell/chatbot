@@ -1678,23 +1678,39 @@ def contains_latex(text: str) -> bool:
         r'\\begin\{',               # \begin{ environments
         r'\\\(',                    # \( inline LaTeX
         r'\\\)',                    # \) inline LaTeX
+        r'\\frac\{',                # Fractions
+        r'\\sqrt\{',                # Racines carrées
+        r'\\left\\',                # Délimiteurs left
+        r'\\right\\',               # Délimiteurs right
+        r'\\sum\b',                 # Somme
+        r'\\prod\b',                # Produit
+        r'\\int\b',                 # Intégrale
+        r'\\dfrac\{',               # Display fractions
+        r'\\binom\{',               # Binomiales
+        r'\\mathbf\{',              # Bold math
+        r'\\mathbb\{',              # Blackboard bold
+        r'\\mathcal\{',             # Calligraphie
+        r'\\text\{',                # Text dans les formules
+        r'\\displaystyle\b',        # Display style
     ]
     return any(re.search(pattern, text) for pattern in patterns)
 
 def extract_latex_equations(text: str):
-    """Extrait toutes les équations LaTeX du texte"""
+    """Extrait toutes les équations LaTeX du texte avec meilleure détection"""
     equations = []
     
     # Trouver les environnements \begin{...}\end{...}
-    equations.extend(re.findall(r'\\begin\{.*?\}.*?\\end\{.*?\}', text, re.DOTALL))
+    equations.extend(re.findall(r'\\begin\{[^}]*\}.*?\\end\{[^}]*\}', text, re.DOTALL))
     # Trouver les \[ ... \] équations
     equations.extend(re.findall(r'\\\[.*?\\\]', text, re.DOTALL))
     # Trouver les $$ ... $$ équations
     equations.extend(re.findall(r'\$\$.*?\$\$', text, re.DOTALL))
     # Trouver les \(...\) équations inline
     equations.extend(re.findall(r'\\\(.*?\\\)', text, re.DOTALL))
-    # Trouver les $ ... $ équations inline
+    # Trouver les $ ... $ équations inline (mais pas les $$ )
     equations.extend(re.findall(r'(?<!\$)\$[^\$]+\$(?!\$)', text, re.DOTALL))
+    # Trouver les fractions seules
+    equations.extend(re.findall(r'\\(?:dfrac|frac|sqrt|mathbf|mathbb|mathcal|text)\{[^}]*\}', text, re.DOTALL))
     
     return equations
 
@@ -1702,81 +1718,135 @@ def render_latex_content(text: str) -> str:
     """Convertit et améliore les délimiteurs LaTeX pour meilleur rendu MathJax"""
     if not text:
         return ""
-
-    def _looks_like_math(expr: str) -> bool:
-        return bool(re.search(
-            r'\\[a-zA-Z]+|[_^]|=|\\frac|\\sum|\\arg|\\theta|\\phi|\\omega|\\begin\{|\\end\{|\d+\s*[\+\-\*/]\s*\d+',
-            expr
-        ))
-
-    text = text.replace('\r\n', '\n')
-    text = re.sub(r'(?i)undefined', '', text)
-    text = re.sub(r'//+', '\n\n', text)
-    text = re.sub(r'[\u200b-\u200f\u2060\ufeff]', '', text)
-
-    # Étape 1: Normaliser les délimiteurs display cassés de type [ \ ... ]
-    text = re.sub(r'(?m)^\s*\[\s*\\?\s*$', r'\\[', text)
-    text = re.sub(r'(?m)^\s*\]\s*$', r'\\]', text)
-
-    # Étape 2: Convertir les lignes "[ ... ]" en display si contenu mathématique
-    def _line_bracket_to_display(match):
-        inner = match.group(1).strip()
-        if not _looks_like_math(inner):
-            return match.group(0)
-        inner = re.sub(r'^\s*\\\[\s*', '', inner)
-        inner = re.sub(r'\s*\\\]\s*$', '', inner)
-        return f"\\[\n{inner}\n\\]"
-
-    text = re.sub(r'(?m)^\s*\[(.+?)\]\s*$', _line_bracket_to_display, text)
-
-    # Étape 3: Envelopper les environnements math non encadrés dans des délimiteurs display
+    
+    # Étape 0: Nettoyer les caractères Unicode mal formés (corruption courante)
+    # Remplacer les caractères diacritiques corrompus
+    unicode_fixes = {
+        'eˊ': 'é',
+        'aˋ': 'à',
+        'uˆ': 'û',
+        'oˆ': 'ô',
+        '−': '-',           # Moins unicode par tiret normal
+        '‑': '-',           # Tiret sans chasse par tiret normal
+        '–': '-',           # En-tiret par tiret normal
+        '—': '-',           # Em-tiret par tiret normal
+        'ˈ': '\'',          # Modifiant levé par apostrophe
+        '\\,': ',',         # Virgule issue de mauvaise conversion
+        ',,': ',',          # Virgules doubles
+    }
+    for bad_char, good_char in unicode_fixes.items():
+        text = text.replace(bad_char, good_char)
+    
+    # Étape 1: Normaliser uniquement les délimiteurs display cassés de type [ \ ... ]
+    # Exemple: "[ \n ... ]" -> "\[\n...\n\]"
     text = re.sub(
-        r'(?<!\\\[)(\\begin\{(aligned|equation|eqnarray|align|gather|multline|flalign|alignat|cases|array|matrix|pmatrix|bmatrix|vmatrix|Vmatrix)\}.*?\\end\{\2\})(?!\\\])',
-        r'\\[\n\1\n\\]',
+        r'(?m)^\s*\[\s*\\?\s*$',
+        r'\\[',
+        text
+    )
+    text = re.sub(
+        r'(?m)^\s*\]\s*$',
+        r'\\]',
+        text
+    )
+    
+    # Étape 2: Nettoyer les structures mal formées
+    # Supprimer les \\ orphelins au début ou fin
+    text = re.sub(r'^\\\\\s+', '', text, flags=re.MULTILINE)
+    text = re.sub(r'\s+\\\\$', '', text, flags=re.MULTILINE)
+    # Nettoyer les − mal formés qui ne sont pas remplacés
+    text = re.sub(r'(?<!\\)−(?!=)', '-', text)
+    # Nettoyer les astérisques doublés qui sont des artefacts
+    text = re.sub(r'\*\*([^*]+?)\*\*', r'**\1**', text)
+    
+    # Étape 3: Envelopper les environnements \begin{...}\end{...} dans \[ ... \]
+    text = re.sub(
+        r'(?<!\[)\\begin\{(aligned|equation|eqnarray|align|gather|multline|flalign|alignat|cases|array|matrix|pmatrix|bmatrix|vmatrix|Vmatrix|split|equation\*|align\*)\}(.*?)\\end\{\1\}(?!\])',
+        r'\\\[\n\\begin{\1}\2\\end{\1}\n\\\]',
         text,
         flags=re.DOTALL
     )
-
-    # Étape 4: Normaliser inline LaTeX
+    
+    # Étape 4: Normaliser les délimiteurs LaTeX inline
+    # \(...\) → $...$
     text = re.sub(r'\\\((.*?)\\\)', r'$\1$', text, flags=re.DOTALL)
-
-    # Étape 5: Réparer artefacts fréquents observés
-    text = re.sub(r'\\\[\s*\\\[', r'\\[', text)
-    text = re.sub(r'\\\]\s*\\\]', r'\\]', text)
-    text = re.sub(r'\\\[4pt\]', r'\\\\[4pt]', text)
-    text = re.sub(r'\\operatorname\{atan2\}!\s*\(', r'\\operatorname{atan2}(', text)
-    text = re.sub(r'atan2!\s*\(', r'atan2(', text)
-    text = re.sub(r',(\s*,)', ',', text)
-    text = re.sub(r',\s*;', r', ', text)
+    
+    # Étape 5: Nettoyer les espaces autour des délimiteurs display
+    text = re.sub(r'(\S)\\\[', r'\1\n\n\\\[', text)  # Nouveau ligne avant
+    text = re.sub(r'\\\](\S)', r'\\\]\n\n\1', text)  # Nouveau ligne après
+    
+    # Étape 6: Nettoyer les multiples lignes blanches
+    text = re.sub(r'\n\n\n+', r'\n\n', text)
+    
+    # Étape 7: Éviter les espaces accidentels dans les délimiteurs
+    text = re.sub(r'\$\s+', '$', text)
+    text = re.sub(r'\s+\$', '$', text)
+    text = re.sub(r'\\\[\s+', '\\\[', text)
+    text = re.sub(r'\s+\\\]', '\\\]', text)
+    text = re.sub(r'\$\$\s+', '$$', text)
+    text = re.sub(r'\s+\$\$', '$$', text)
+    
+    # Étape 8: Nettoyer les caractères spéciaux corrompus
+    # Remplacer les virgules qui ne devraient pas être là (ex: 1,ms → 1.\text{ms})
+    text = re.sub(r'(\d),(\s*\\text)', r'\1.\2', text)
+    # Nettoyer les \bigl ( avec espace → \bigl(
+    text = re.sub(r'\\bigl\s+\(', r'\\bigl(', text)
+    text = re.sub(r'\\bigr\s+\)', r'\\bigr)', text)
+    text = re.sub(r'\\Bigl\s+\(', r'\\Bigl(', text)
+    text = re.sub(r'\\Bigr\s+\)', r'\\Bigr)', text)
+    # Nettoyer les \bigl[ avec espace
+    text = re.sub(r'\\bigl\s+\[', r'\\bigl[', text)
+    text = re.sub(r'\\bigr\s+\]', r'\\bigr]', text)
+    text = re.sub(r'\\Bigl\s+\[', r'\\Bigl[', text)
+    text = re.sub(r'\\Bigr\s+\]', r'\\Bigr]', text)
+    
+    # Étape 9: Nettoyer les mystérieux caractères d'exclamation
+    text = re.sub(r'!\s*\(', '(', text)
+    text = re.sub(r'!\s*\[', '[', text)
+    text = re.sub(r'!\s*\\Bigl', r'\\Bigl', text)
+    text = re.sub(r'!\s*\\Bigr', r'\\Bigr', text)
+    text = re.sub(r'!\s*\\bigl', r'\\bigl', text)
+    text = re.sub(r'!\s*\\bigr', r'\\bigr', text)
+    
+    # Étape 10: Nettoyer les points-virgules bizarres
     text = re.sub(r';\s*\\', r'\\', text)
-    text = re.sub(r'\\boxed\{\s*;\s*', r'\\boxed{', text)
-    text = re.sub(r';\s*\}', r'}', text)
+    
+    # Étape 11: Nettoyer les virgules dans les fonctions (ex: atan2(y,,x) → atan2(y,x))
+    text = re.sub(r',(\s*,)', ',', text)
+    
+    # Étape 12: Corriger les artefacts fréquents du modèle dans les formules
     text = re.sub(r'\\arg\\min_\\mathbf\{H\}', r'\\arg\\min_{\\mathbf{H}}', text)
-    text = re.sub(r'\\mathbf\{H\},\\mathbf\{u\}_i', r'\\mathbf{H}\\mathbf{u}_i', text)
-    text = re.sub(r'(\d),(\s*\\text\{ms\})', r'\1.\2', text)
-    text = re.sub(r'(\b(?:x|z|v)_[^=\n]{0,40}?&=\s*[^\\\n]{1,80})\s+((?:x|z|v)_[^=\n]{0,40}?&=)',
-                  r'\1 \\\\ \2', text)
-    text = re.sub(r'(\}\s*)\\text\{SWING\}', r'\1\\\\ \\text{SWING}', text)
-    text = re.sub(r'\\\\text\{SWING\}', r'\\\\ \\text{SWING}', text)
-    text = re.sub(r'(?<=\S)\\\[', r'\n\n\\[', text)
-    text = re.sub(r'\\\](?=\S)', r'\\]\n\n', text)
-
-    # Étape 6: Streamlit rend plus fiablement $$...$$ que \[...\]
-    text = re.sub(r'\\\[\s*', '$$\n', text)
-    text = re.sub(r'\s*\\\]', '\n$$', text)
-    text = re.sub(r'\$\$\s*\$\$', '$$\n\n$$', text)
-
-    # Encadrer les lignes de type "x = ... \text{...}" restées hors bloc
-    text = re.sub(
-        r'(?m)^(?!\s*\$\$)\s*([xzv]\s*=\s*[^$\n]*\\text\{[^}]+\}[^$\n]*)\s*$',
-        r'$$\n\1\n$$',
-        text
-    )
-    text = re.sub(r'\$\$\s*\$\$', '$$\n\n$$', text)
-
-    # Étape 7: Nettoyage final
-    text = re.sub(r'\n{3,}', '\n\n', text)
-
+    text = re.sub(r'\\arg\\max_\\mathbf\{H\}', r'\\arg\\max_{\\mathbf{H}}', text)
+    text = re.sub(r'\\mathbf\{H\},\\mathbf\{u\}_i', r'\\mathbf{H}\\,\\mathbf{u}_i', text)
+    text = re.sub(r'\\omega_z\\\s*v_R', r'\\omega_z \\\\ v_R', text)
+    text = re.sub(r'\\\]\s*,\s*\\\[\s*', r'\\]\n\n\\[', text)
+    # Corriger les fonctions avec espaces mal placés
+    text = re.sub(r'(\w)\s*\(\s*', r'\1(', text)
+    
+    # Étape 13: Normaliser les délimiteurs de fractions et autres commandes LaTeX
+    text = re.sub(r'\\frac\s+\{', r'\\frac{', text)
+    text = re.sub(r'\\sqrt\s+\{', r'\\sqrt{', text)
+    text = re.sub(r'\\left\s+\\', r'\\left\\', text)
+    text = re.sub(r'\\right\s+\\', r'\\right\\', text)
+    
+    # Étape 14: Nettoyer les délimiteurs mal échappés 
+    text = re.sub(r'\$\\', r'$\\', text)
+    # Corriger les double dollars mal formés
+    text = re.sub(r'\$\$\$+', r'$$', text)
+    
+    # Étape 15: Marquer les environnements display orphelins
+    # Si on a une \[ sans \], on l'ajoute
+    open_display = text.count(r'\[') - text.count(r'\]')
+    if open_display > 0:
+        text = text.rstrip() + '\n\\\]'
+    
+    # Étape 16: Marquer les environnements inline orphelins (mais pas trop agressif)
+    # Compter les $ mais ignorer les $$
+    single_dollars = len(re.findall(r'(?<!\$)\$(?!\$)', text))
+    if single_dollars % 2 != 0:
+        # Nombre impair, ajouter un dernier $
+        text = text.rstrip() + ' $'
+    
     return text.strip()
 
 def display_ai_response_with_latex(response: str, token_manager):
