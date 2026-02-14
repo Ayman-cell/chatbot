@@ -1715,137 +1715,113 @@ def extract_latex_equations(text: str):
     return equations
 
 def render_latex_content(text: str) -> str:
-    """Convertit et améliore les délimiteurs LaTeX pour meilleur rendu MathJax"""
+    """Convertit et améliore les délimiteurs LaTeX pour meilleur rendu MathJax - VERSION ROBUSTE"""
     if not text:
         return ""
     
-    # Étape 0: Nettoyer les caractères Unicode mal formés (corruption courante)
-    # Remplacer les caractères diacritiques corrompus
-    unicode_fixes = {
-        'eˊ': 'é',
-        'aˋ': 'à',
-        'uˆ': 'û',
-        'oˆ': 'ô',
-        '−': '-',           # Moins unicode par tiret normal
-        '‑': '-',           # Tiret sans chasse par tiret normal
-        '–': '-',           # En-tiret par tiret normal
-        '—': '-',           # Em-tiret par tiret normal
-        'ˈ': '\'',          # Modifiant levé par apostrophe
-        '\\,': ',',         # Virgule issue de mauvaise conversion
-        ',,': ',',          # Virgules doubles
+    # ÉTAPE 0: Nettoyer les caractères Unicode corrompus AVANT tout
+    unicode_map = {
+        'eˊ': 'é', 'aˋ': 'à', 'uˆ': 'û', 'oˆ': 'ô', 'íˋ': 'í',
+        # Tirets Unicode
+        '−': '-', '‑': '-', '–': '-', '—': '-',
+        # Caractères bizarres
+        'ˈ': '\'', '⁡': '', '​': '', '\u200b': '',
+        # Points d'exclamation mal placés
+        '!\\': '\\', '!{': '{', '![': '[',
+        # Virgules bizarres
+        '\\,': ',', ',,': ',', ' ,': ',',
     }
-    for bad_char, good_char in unicode_fixes.items():
-        text = text.replace(bad_char, good_char)
+    for old, new in unicode_map.items():
+        text = text.replace(old, new)
     
-    # Étape 1: Normaliser uniquement les délimiteurs display cassés de type [ \ ... ]
-    # Exemple: "[ \n ... ]" -> "\[\n...\n\]"
-    text = re.sub(
-        r'(?m)^\s*\[\s*\\?\s*$',
-        r'\\[',
-        text
-    )
-    text = re.sub(
-        r'(?m)^\s*\]\s*$',
-        r'\\]',
-        text
-    )
+    # ÉTAPE 1: Convertir les crochets mal formés en délimiteurs LaTeX
+    # [équation] -> $$équation$$
+    text = re.sub(r'\[\s*([a-zA-Z0-9\\].*?[a-zA-Z0-9\\}\)])\s*\](?!\])', r'$$\1$$', text, flags=re.DOTALL)
     
-    # Étape 2: Nettoyer les structures mal formées
-    # Supprimer les \\ orphelins au début ou fin
-    text = re.sub(r'^\\\\\s+', '', text, flags=re.MULTILINE)
-    text = re.sub(r'\s+\\\\$', '', text, flags=re.MULTILINE)
-    # Nettoyer les − mal formés qui ne sont pas remplacés
-    text = re.sub(r'(?<!\\)−(?!=)', '-', text)
-    # Nettoyer les astérisques doublés qui sont des artefacts
-    text = re.sub(r'\*\*([^*]+?)\*\*', r'**\1**', text)
+    # ÉTAPE 2: Convertir les \[ au début de lignes en bloc d'équation correct
+    text = re.sub(r'^(\\\[)(.+?)(\\\])$', r'\\\[\n\2\n\\\]', text, flags=re.MULTILINE | re.DOTALL)
     
-    # Étape 3: Envelopper les environnements \begin{...}\end{...} dans \[ ... \]
+    # ÉTAPE 3: Envelopper les \begin{...}\end{...} dans \[...\]
     text = re.sub(
-        r'(?<!\[)\\begin\{(aligned|equation|eqnarray|align|gather|multline|flalign|alignat|cases|array|matrix|pmatrix|bmatrix|vmatrix|Vmatrix|split|equation\*|align\*)\}(.*?)\\end\{\1\}(?!\])',
-        r'\\\[\n\\begin{\1}\2\\end{\1}\n\\\]',
+        r'(?<!\[)(\s*)\\begin\{(aligned|equation|eqnarray|align|gather|multline|flalign|alignat|cases|array|matrix|pmatrix|bmatrix|vmatrix|Vmatrix|split)\}(.*?)\\end\{\2\}(?!\])',
+        r'\1\\\[\n\\begin{\2}\3\\end{\2}\n\\\]',
         text,
         flags=re.DOTALL
     )
     
-    # Étape 4: Normaliser les délimiteurs LaTeX inline
-    # \(...\) → $...$
+    # ÉTAPE 4: Normaliser les \(  \) -> $  $
     text = re.sub(r'\\\((.*?)\\\)', r'$\1$', text, flags=re.DOTALL)
     
-    # Étape 5: Nettoyer les espaces autour des délimiteurs display
-    text = re.sub(r'(\S)\\\[', r'\1\n\n\\\[', text)  # Nouveau ligne avant
-    text = re.sub(r'\\\](\S)', r'\\\]\n\n\1', text)  # Nouveau ligne après
+    # ÉTAPE 5: Corriger les délimiteurs display orphelins
+    # Compter les \[ et \]
+    open_brackets = text.count(r'\[')
+    close_brackets = text.count(r'\]')
+    if open_brackets > close_brackets:
+        for _ in range(open_brackets - close_brackets):
+            text = text.rstrip() + '\n\\\]'
+    elif close_brackets > open_brackets:
+        for _ in range(close_brackets - open_brackets):
+            text = '\\\[\n' + text
     
-    # Étape 6: Nettoyer les multiples lignes blanches
-    text = re.sub(r'\n\n\n+', r'\n\n', text)
+    # ÉTAPE 6: Corriger les délimiteurs inline $ orphelins
+    single_dollar_count = len(re.findall(r'(?<!\$)\$(?!\$)', text))
+    if single_dollar_count % 2 != 0:
+        text = text.rstrip() + ' $'
     
-    # Étape 7: Éviter les espaces accidentels dans les délimiteurs
-    text = re.sub(r'\$\s+', '$', text)
-    text = re.sub(r'\s+\$', '$', text)
+    # ÉTAPE 7: Nettoyer les espaces autour des délimiteurs
     text = re.sub(r'\\\[\s+', '\\\[', text)
     text = re.sub(r'\s+\\\]', '\\\]', text)
+    text = re.sub(r'\$\s+', '$', text)
+    text = re.sub(r'\s+\$', '$', text)
     text = re.sub(r'\$\$\s+', '$$', text)
     text = re.sub(r'\s+\$\$', '$$', text)
     
-    # Étape 8: Nettoyer les caractères spéciaux corrompus
-    # Remplacer les virgules qui ne devraient pas être là (ex: 1,ms → 1.\text{ms})
-    text = re.sub(r'(\d),(\s*\\text)', r'\1.\2', text)
-    # Nettoyer les \bigl ( avec espace → \bigl(
-    text = re.sub(r'\\bigl\s+\(', r'\\bigl(', text)
-    text = re.sub(r'\\bigr\s+\)', r'\\bigr)', text)
-    text = re.sub(r'\\Bigl\s+\(', r'\\Bigl(', text)
-    text = re.sub(r'\\Bigr\s+\)', r'\\Bigr)', text)
-    # Nettoyer les \bigl[ avec espace
-    text = re.sub(r'\\bigl\s+\[', r'\\bigl[', text)
-    text = re.sub(r'\\bigr\s+\]', r'\\bigr]', text)
-    text = re.sub(r'\\Bigl\s+\[', r'\\Bigl[', text)
-    text = re.sub(r'\\Bigr\s+\]', r'\\Bigr]', text)
+    # ÉTAPE 8: Nettoyer les espaces mal placés dans les commandes LaTeX
+    text = re.sub(r'\\(frac|sqrt|dfrac|binom|text|mathbf|mathbb|mathcal|mathrm)\s+\{', r'\\\1{', text)
+    text = re.sub(r'\\(left|right|bigl|bigr|Bigl|Bigr|Big|big)\s+([\\()\[\]|.])', r'\\\1\2', text)
     
-    # Étape 9: Nettoyer les mystérieux caractères d'exclamation
-    text = re.sub(r'!\s*\(', '(', text)
-    text = re.sub(r'!\s*\[', '[', text)
-    text = re.sub(r'!\s*\\Bigl', r'\\Bigl', text)
-    text = re.sub(r'!\s*\\Bigr', r'\\Bigr', text)
-    text = re.sub(r'!\s*\\bigl', r'\\bigl', text)
-    text = re.sub(r'!\s*\\bigr', r'\\bigr', text)
+    # ÉTAPE 9: Ajouter des espacements autour des équations display
+    text = re.sub(r'(\S)\\\[', r'\1\n\n\\\[', text)
+    text = re.sub(r'\\\](\S)', r'\\\]\n\n\1', text)
     
-    # Étape 10: Nettoyer les points-virgules bizarres
-    text = re.sub(r';\s*\\', r'\\', text)
+    # ÉTAPE 10: Ajouter des espacements autour des équations $$
+    text = re.sub(r'(\S)\$\$', r'\1\n\n$$', text)
+    text = re.sub(r'\$\$(\S)', r'$$\n\n\1', text)
     
-    # Étape 11: Nettoyer les virgules dans les fonctions (ex: atan2(y,,x) → atan2(y,x))
-    text = re.sub(r',(\s*,)', ',', text)
+    # ÉTAPE 11: Nettoyer les multiples lignes blanches
+    text = re.sub(r'\n\n\n+', r'\n\n', text)
     
-    # Étape 12: Corriger les artefacts fréquents du modèle dans les formules
-    text = re.sub(r'\\arg\\min_\\mathbf\{H\}', r'\\arg\\min_{\\mathbf{H}}', text)
-    text = re.sub(r'\\arg\\max_\\mathbf\{H\}', r'\\arg\\max_{\\mathbf{H}}', text)
-    text = re.sub(r'\\mathbf\{H\},\\mathbf\{u\}_i', r'\\mathbf{H}\\,\\mathbf{u}_i', text)
-    text = re.sub(r'\\omega_z\\\s*v_R', r'\\omega_z \\\\ v_R', text)
-    text = re.sub(r'\\\]\s*,\s*\\\[\s*', r'\\]\n\n\\[', text)
-    # Corriger les fonctions avec espaces mal placés
-    text = re.sub(r'(\w)\s*\(\s*', r'\1(', text)
+    # ÉTAPE 12: Corriger les artefacts spécifiques de Cerebras
+    text = re.sub(r'\\top}', r'^{\\top}', text)  # ⊤ mal formé
+    text = re.sub(r'!\s*\\top', r'^{\\top}', text)
+    text = re.sub(r'!\\top', r'^{\\top}', text)
+    text = re.sub(r'!\\\(', r'\\\(', text)
+    text = re.sub(r'!\\\[', r'\\\[', text)
     
-    # Étape 13: Normaliser les délimiteurs de fractions et autres commandes LaTeX
-    text = re.sub(r'\\frac\s+\{', r'\\frac{', text)
-    text = re.sub(r'\\sqrt\s+\{', r'\\sqrt{', text)
-    text = re.sub(r'\\left\s+\\', r'\\left\\', text)
-    text = re.sub(r'\\right\s+\\', r'\\right\\', text)
+    # ÉTAPE 13: Corriger les \,  mal placés (thin space)
+    text = re.sub(r',\s*\\,', r',\\,', text)
+    text = re.sub(r'\\,\\,', r'\\,', text)
     
-    # Étape 14: Nettoyer les délimiteurs mal échappés 
-    text = re.sub(r'\$\\', r'$\\', text)
-    # Corriger les double dollars mal formés
-    text = re.sub(r'\$\$\$+', r'$$', text)
+    # ÉTAPE 14: Corriger les parenthèses dans les indices/exposants
+    text = re.sub(r'_\s*\(', r'_(', text)
+    text = re.sub(r'\^\s*\(', r'^(', text)
+    text = re.sub(r'_\s*\{', r'_{', text)
+    text = re.sub(r'\^\s*\{', r'^{', text)
     
-    # Étape 15: Marquer les environnements display orphelins
-    # Si on a une \[ sans \], on l'ajoute
-    open_display = text.count(r'\[') - text.count(r'\]')
-    if open_display > 0:
-        text = text.rstrip() + '\n\\\]'
+    # ÉTAPE 15: Nettoyer les caractères de contrôle
+    text = re.sub(r'[\x00-\x08\x0b-\x0c\x0e-\x1f]', '', text)
     
-    # Étape 16: Marquer les environnements inline orphelins (mais pas trop agressif)
-    # Compter les $ mais ignorer les $$
-    single_dollars = len(re.findall(r'(?<!\$)\$(?!\$)', text))
-    if single_dollars % 2 != 0:
-        # Nombre impair, ajouter un dernier $
-        text = text.rstrip() + ' $'
+    # ÉTAPE 16: Corriger les cas où il y a ][ ou )( côte à côte sans espace
+    text = re.sub(r'\]\s*\[', r'] [', text)
+    text = re.sub(r'\)\s*\(', r') (', text)
+    
+    # ÉTAPE 17: Vérifier et corriger les délimiteurs non fermés aux extrémités
+    stripped = text.strip()
+    if stripped.startswith('\\\[') and not stripped.endswith('\\\]'):
+        stripped = stripped + '\n\\\]'
+    if stripped.startswith('$$') and not stripped.endswith('$$'):
+        stripped = stripped + '$$'
+    text = stripped
     
     return text.strip()
 
