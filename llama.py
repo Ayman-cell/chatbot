@@ -1708,94 +1708,75 @@ def render_latex_content(text: str) -> str:
             r'\\[a-zA-Z]+|[_^]|=|\\frac|\\sum|\\arg|\\theta|\\phi|\\omega|\\begin\{|\\end\{|\d+\s*[\+\-\*/]\s*\d+',
             expr
         ))
-    
-    # Étape 1: Normaliser uniquement les délimiteurs display cassés de type [ \ ... ]
-    # Exemple: "[ \n ... ]" -> "\[\n...\n\]"
-    text = re.sub(
-        r'(?m)^\s*\[\s*\\?\s*$',
-        r'\\[',
-        text
-    )
-    text = re.sub(
-        r'(?m)^\s*\]\s*$',
-        r'\\]',
-        text
-    )
 
-    # Étape 1b: Convertir les lignes "[ ... ]" en bloc LaTeX si le contenu est mathématique
+    text = text.replace('\r\n', '\n')
+    text = re.sub(r'(?i)undefined', '', text)
+    text = re.sub(r'//+', '\n\n', text)
+    text = re.sub(r'[\u200b-\u200f\u2060\ufeff]', '', text)
+
+    # Étape 1: Normaliser les délimiteurs display cassés de type [ \ ... ]
+    text = re.sub(r'(?m)^\s*\[\s*\\?\s*$', r'\\[', text)
+    text = re.sub(r'(?m)^\s*\]\s*$', r'\\]', text)
+
+    # Étape 2: Convertir les lignes "[ ... ]" en display si contenu mathématique
     def _line_bracket_to_display(match):
         inner = match.group(1).strip()
-        if _looks_like_math(inner):
-            inner = re.sub(r'^\s*\\\[\s*', '', inner)
-            inner = re.sub(r'\s*\\\]\s*$', '', inner)
-            return f"\\[\n{inner}\n\\]"
-        return match.group(0)
+        if not _looks_like_math(inner):
+            return match.group(0)
+        inner = re.sub(r'^\s*\\\[\s*', '', inner)
+        inner = re.sub(r'\s*\\\]\s*$', '', inner)
+        return f"\\[\n{inner}\n\\]"
 
+    text = re.sub(r'(?m)^\s*\[(.+?)\]\s*$', _line_bracket_to_display, text)
+
+    # Étape 3: Envelopper les environnements math non encadrés dans des délimiteurs display
     text = re.sub(
-        r'(?m)^\s*\[(.+?)\]\s*$',
-        _line_bracket_to_display,
-        text
-    )
-    
-    # Étape 2: Nettoyer les structures mal formées
-    # Supprimer les \\ orphelins au début ou fin
-    text = re.sub(r'^\\\\\s+', '', text, flags=re.MULTILINE)
-    text = re.sub(r'\s+\\\\$', '', text, flags=re.MULTILINE)
-    
-    # Étape 3: Envelopper les environnements \begin{...}\end{...} dans \[ ... \]
-    text = re.sub(
-        r'(?<!\[)\\begin\{(aligned|equation|eqnarray|align|gather|multline|flalign|alignat|cases|array|matrix|pmatrix|bmatrix|vmatrix|Vmatrix)\}(.*?)\\end\{\1\}(?!\])',
-        r'\\\[\n\\begin{\1}\2\\end{\1}\n\\\]',
+        r'(?<!\\\[)(\\begin\{(aligned|equation|eqnarray|align|gather|multline|flalign|alignat|cases|array|matrix|pmatrix|bmatrix|vmatrix|Vmatrix)\}.*?\\end\{\2\})(?!\\\])',
+        r'\\[\n\1\n\\]',
         text,
         flags=re.DOTALL
     )
-    
-    # Étape 4: Normaliser les délimiteurs LaTeX inline
-    # \(...\) → $...$
-    text = re.sub(r'\\\((.*?)\\\)', r'$\1$', text, flags=re.DOTALL)
-    
-    # Étape 5: Nettoyer les espaces autour des délimiteurs display
-    text = re.sub(r'(\S)\\\[', r'\1\n\n\\\[', text)  # Nouveau ligne avant
-    text = re.sub(r'\\\](\S)', r'\\\]\n\n\1', text)  # Nouveau ligne après
-    
-    # Étape 6: Nettoyer les multiples lignes blanches
-    text = re.sub(r'\n\n\n+', r'\n\n', text)
-    
-    # Étape 7: Éviter les espaces accidentels dans les délimiteurs
-    text = re.sub(r'\$\s+', '$', text)
-    text = re.sub(r'\s+\$', '$', text)
-    text = re.sub(r'\\\[\s+', r'\\[', text)
-    text = re.sub(r'\s+\\\]', r'\\]', text)
-    
-    # Étape 8: Nettoyer les caractères spéciaux corrompus
-    # Remplacer les virgules qui ne devraient pas être là (ex: 1,ms → 1.\text{ms})
-    text = re.sub(r'(\d),(\s*\\text)', r'\1.\2', text)
-    # Nettoyer les \bigl ( avec espace → \bigl(
-    text = re.sub(r'\\bigl\s+\(', r'\\bigl(', text)
-    text = re.sub(r'\\bigr\s+\)', r'\\bigr)', text)
-    # Nettoyer les \bigl[ avec espace
-    text = re.sub(r'\\bigl\s+\[', r'\\bigl[', text)
-    text = re.sub(r'\\bigr\s+\]', r'\\bigr]', text)
-    
-    # Étape 9: Nettoyer les points d'exclamation bizarres avant les parenthèses
-    text = re.sub(r'!\s*\(', '(', text)
-    text = re.sub(r'!\s*\[', '[', text)
-    
-    # Étape 10: Nettoyer les points-virgules bizarres
-    text = re.sub(r';\s*\\', r'\\', text)
-    
-    # Étape 11: Nettoyer les virgules dans les fonctions (ex: atan2(y,,x) → atan2(y,x))
-    text = re.sub(r',(\s*,)', ',', text)
 
-    # Étape 12: Corriger quelques artefacts fréquents du modèle dans les formules
-    text = re.sub(r'\\arg\\min_\\mathbf\{H\}', r'\\arg\\min_{\\mathbf{H}}', text)
-    text = re.sub(r'\\mathbf\{H\},\\mathbf\{u\}_i', r'\\mathbf{H}\\,\\mathbf{u}_i', text)
-    text = re.sub(r'\\omega_z\\\s*v_R', r'\\omega_z \\\\ v_R', text)
-    text = re.sub(r'\\\]\s*,\s*\\\[\s*', r'\\]\n\n\\[', text)
+    # Étape 4: Normaliser inline LaTeX
+    text = re.sub(r'\\\((.*?)\\\)', r'$\1$', text, flags=re.DOTALL)
+
+    # Étape 5: Réparer artefacts fréquents observés
+    text = re.sub(r'\\\[\s*\\\[', r'\\[', text)
+    text = re.sub(r'\\\]\s*\\\]', r'\\]', text)
+    text = re.sub(r'\\\[4pt\]', r'\\\\[4pt]', text)
     text = re.sub(r'\\operatorname\{atan2\}!\s*\(', r'\\operatorname{atan2}(', text)
+    text = re.sub(r'atan2!\s*\(', r'atan2(', text)
+    text = re.sub(r',(\s*,)', ',', text)
+    text = re.sub(r',\s*;', r', ', text)
+    text = re.sub(r';\s*\\', r'\\', text)
     text = re.sub(r'\\boxed\{\s*;\s*', r'\\boxed{', text)
     text = re.sub(r';\s*\}', r'}', text)
-    
+    text = re.sub(r'\\arg\\min_\\mathbf\{H\}', r'\\arg\\min_{\\mathbf{H}}', text)
+    text = re.sub(r'\\mathbf\{H\},\\mathbf\{u\}_i', r'\\mathbf{H}\\mathbf{u}_i', text)
+    text = re.sub(r'(\d),(\s*\\text\{ms\})', r'\1.\2', text)
+    text = re.sub(r'(\b(?:x|z|v)_[^=\n]{0,40}?&=\s*[^\\\n]{1,80})\s+((?:x|z|v)_[^=\n]{0,40}?&=)',
+                  r'\1 \\\\ \2', text)
+    text = re.sub(r'(\}\s*)\\text\{SWING\}', r'\1\\\\ \\text{SWING}', text)
+    text = re.sub(r'\\\\text\{SWING\}', r'\\\\ \\text{SWING}', text)
+    text = re.sub(r'(?<=\S)\\\[', r'\n\n\\[', text)
+    text = re.sub(r'\\\](?=\S)', r'\\]\n\n', text)
+
+    # Étape 6: Streamlit rend plus fiablement $$...$$ que \[...\]
+    text = re.sub(r'\\\[\s*', '$$\n', text)
+    text = re.sub(r'\s*\\\]', '\n$$', text)
+    text = re.sub(r'\$\$\s*\$\$', '$$\n\n$$', text)
+
+    # Encadrer les lignes de type "x = ... \text{...}" restées hors bloc
+    text = re.sub(
+        r'(?m)^(?!\s*\$\$)\s*([xzv]\s*=\s*[^$\n]*\\text\{[^}]+\}[^$\n]*)\s*$',
+        r'$$\n\1\n$$',
+        text
+    )
+    text = re.sub(r'\$\$\s*\$\$', '$$\n\n$$', text)
+
+    # Étape 7: Nettoyage final
+    text = re.sub(r'\n{3,}', '\n\n', text)
+
     return text.strip()
 
 def display_ai_response_with_latex(response: str, token_manager):
