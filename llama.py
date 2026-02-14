@@ -1017,8 +1017,65 @@ def load_conversation_to_session(conv):
         st.rerun()
 
 def add_latex_css():
-    """Fonction vide - LaTeX supprimé"""
-    pass
+    """Configure MathJax et ajoute le CSS pour les équations LaTeX"""
+    # Configuration MathJax pour le rendu des équations LaTeX
+    st.markdown("""
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\\\(', '\\\\)']],
+          displayMath: [['$$', '$$'], ['\\\\[', '\\\\]']],
+          processEscapes: true,
+          processEnvironments: true,
+          packages: {
+            '[+]': ['amsmath', 'amssymb', 'amsfonts', 'cancel', 'empheq']
+          }
+        },
+        chtml: {
+          displayAlign: 'left',
+          displayIndent: '0em'
+        },
+        startup: {
+          typeset: true,
+          pageReady: () => {
+            return MathJax.typesetPromise();
+          }
+        }
+      };
+    </script>
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    """, unsafe_allow_html=True)
+    
+    # CSS pour les équations LaTeX
+    st.markdown("""
+    <style>
+    /* Support pour les équations LaTeX/MathJax */
+    .MathJax_Display,
+    .katex-display {
+        background: #f7f7f8 !important;
+        padding: 1.5rem !important;
+        border-radius: 8px !important;
+        border-left: 4px solid #d0d0d0 !important;
+        margin: 1.5rem 0 !important;
+        overflow-x: auto;
+        display: block !important;
+    }
+    
+    .MathJax,
+    .katex {
+        color: #0d0d0d !important;
+    }
+    
+    .stMarkdown mjx-container {
+        display: inline !important;
+    }
+    
+    .stMarkdown mjx-container[display="true"] {
+        display: block !important;
+        margin: 1rem 0 !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
 # Styles CSS modernes - Design magnifique et simple
 st.markdown("""
@@ -1574,7 +1631,99 @@ def extract_latex_equations(text: str):
     return equations
 
 def render_latex_content(text: str) -> str:
-    """Fonction simplifiée - retourne le texte tel quel (LaTeX supprimé)"""
+    """
+    Compile et prépare le contenu LaTeX pour l'affichage via MathJax.
+    Nettoie les caractères corrompus et normalise la syntaxe LaTeX.
+    
+    Phases:
+    1. Nettoyage des caractères Unicode mal formés
+    2. Protection des zones LaTeX valides
+    3. Normalisation des délimiteurs
+    4. Restauration des zones protégées
+    """
+    if not text:
+        return ""
+    
+    # PHASE 1: Nettoyage des caractères Unicode corrompus
+    # Supprimer les combining marks mal formés
+    unicode_replacements = {
+        'eˊ': 'é', 'aˋ': 'à', 'uˆ': 'û', 'oˆ': 'ô', 'íˋ': 'í',
+        'eˋ': 'è', 'eˆ': 'ê', 'cˆ': 'ç', 'fˆ': 'f', 'aˆ': 'â', 'iˆ': 'î',
+        '−': '-', '‑': '-', '–': '-', '—': '-', '―': '-',
+        '\u200b': '', '\u200c': '', '\u200d': '', '\u202f': ' ',
+        '⁡': '', 'ˈ': '', '​': '', '\u200e': '', '\u200f': '',
+    }
+    for old, new in unicode_replacements.items():
+        text = text.replace(old, new)
+    
+    # Supprimer les diacritiques mal formés (combining marks)
+    combining_marks = ['\u0300', '\u0301', '\u0302', '\u0303', '\u0304',
+                       '\u0305', '\u0306', '\u0307', '\u0308', '\u0309',
+                       '\u030a', '\u030c', '\u0310', '\u0311', '\u0323',
+                       '\u0324', '\u0325', '\u0330', '\u0331', '\u0340']
+    for mark in combining_marks:
+        text = text.replace(mark, '')
+    
+    # PHASE 2: Protéger les zones LaTeX valides pour éviter les transformations
+    protected_zones = {}
+    zone_counter = 0
+    
+    # Protéger \[ ... \]
+    for match in re.finditer(r'\\\[.*?\\\]', text, re.DOTALL):
+        key = f'__LATEX_DISPLAY_{zone_counter}__'
+        protected_zones[key] = match.group(0)
+        text = text.replace(match.group(0), key, 1)
+        zone_counter += 1
+    
+    # Protéger $$ ... $$
+    for match in re.finditer(r'\$\$.*?\$\$', text, re.DOTALL):
+        key = f'__LATEX_DISPLAY_{zone_counter}__'
+        protected_zones[key] = match.group(0)
+        text = text.replace(match.group(0), key, 1)
+        zone_counter += 1
+    
+    # Protéger \(...\)
+    for match in re.finditer(r'\\\(.*?\\\)', text, re.DOTALL):
+        key = f'__LATEX_INLINE_{zone_counter}__'
+        protected_zones[key] = match.group(0)
+        text = text.replace(match.group(0), key, 1)
+        zone_counter += 1
+    
+    # Protéger $ ... $ (mais pas $$ ... $$)
+    parts = []
+    last_end = 0
+    for match in re.finditer(r'(?<!\$)\$(?!\$)(.*?)(?<!\$)\$(?!\$)', text, re.DOTALL):
+        parts.append(text[last_end:match.start()])
+        key = f'__LATEX_INLINE_{zone_counter}__'
+        protected_zones[key] = match.group(0)
+        parts.append(key)
+        zone_counter += 1
+        last_end = match.end()
+    parts.append(text[last_end:])
+    text = ''.join(parts)
+    
+    # PHASE 3: Normaliser les délimiteurs LaTeX et nettoyer les artefacts
+    # Supprimer les ! mal placés avant les commandes LaTeX tout en préservant les espaces
+    text = re.sub(r'!\s*\\', r' \\', text)  # Remplacer ! + \\ par espace + \\
+    text = re.sub(r'!\s*([{\[(])', r' \1', text)  # Remplacer ! + délimiteur par espace + délimiteur
+    text = re.sub(r'!\s*([a-zA-Z])', r' \1', text)  # Remplacer ! + lettre par espace + lettre
+    
+    # Normaliser les espaces dans les commandes LaTeX
+    text = re.sub(r'\\(frac|sqrt|dfrac|binom|sum|prod|int|limits|text|mathbf|mathbb|mathrm)\s*\{', r'\\\1{', text)
+    
+    # Nettoyer les espaces excessifs autour des délimiteurs
+    text = re.sub(r'(\S)\s+\$\$', r'\1\n\n$$', text)
+    text = re.sub(r'\$\$\s+(\S)', r'$$\n\n\1', text)
+    
+    # PHASE 4: Restaurer les zones protégées
+    for key, original in protected_zones.items():
+        text = text.replace(key, original)
+    
+    # PHASE 5: Nettoyage final
+    text = re.sub(r'\n\n\n+', r'\n\n', text)  # Supprimer les sauts de ligne excessifs
+    text = re.sub(r' +', ' ', text)  # Normaliser les espaces multiples
+    text = text.strip()
+    
     return text
 
 def display_ai_response_with_latex(response: str, token_manager):
