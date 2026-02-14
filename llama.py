@@ -315,20 +315,7 @@ class AdvancedRAGProcessor:
         
         return documents
     
-    @staticmethod
-    def contains_latex(text: str) -> bool:
-        """Vérifie si un texte contient du LaTeX"""
-        latex_patterns = [
-            r'\$.*?\$',  # Equations inline
-            r'\\[a-zA-Z]+\{',  # Commandes LaTeX
-            r'\\begin\{',  # Environnements LaTeX
-            r'\\frac\{', r'\\int', r'\\sum', r'\\prod'  # Commandes mathématiques
-        ]
-        
-        for pattern in latex_patterns:
-            if re.search(pattern, text):
-                return True
-        return False
+
     
     @staticmethod
     def hybrid_retrieval(db, query: str, k: int = 15) -> List[LangchainDocument]:
@@ -1016,69 +1003,6 @@ def load_conversation_to_session(conv):
         st.success(f"Conversation '{conv['title'][:30]}...' chargée!")
         st.rerun()
 
-def add_latex_css():
-    """Ajoute le CSS pour l'affichage simplifié"""
-    st.markdown("""
-    <style>
-    .math-container {
-        background: linear-gradient(135deg, #f8f9ff 0%, #e8f4fd 100%);
-        border: 2px solid #e1e8ed;
-        border-radius: 12px;
-        padding: 20px;
-        margin: 15px 0;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        position: relative;
-        overflow-x: auto;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-# Configuration MathJax avancée pour le rendu LaTeX complet
-st.markdown("""
-<script>
-  MathJax = {
-    tex: {
-      inlineMath: [['$', '$'], ['\\\\(', '\\\\)']],
-      displayMath: [['$$', '$$'], ['\\\\[', '\\\\]']],
-      processEscapes: true,
-      processEnvironments: true,
-      packages: {
-        '[+]': ['amsmath', 'amssymb', 'amsfonts', 'cancel', 'empheq']
-      },
-      tags: 'ams',
-      envs: {
-        align: ['AMS', 'aligned'],
-        aligned: ['AMS', 'aligned'],
-        gather: ['AMS', 'gathered'],
-        gathered: ['AMS', 'gathered'],
-        multline: ['AMS', 'multlined'],
-        equation: ['AMS', 'equation'],
-        eqnarray: ['AMS', 'eqnarray']
-      }
-    },
-    chtml: {
-      displayAlign: 'left',
-      displayIndent: '0em'
-    },
-    svg: {
-      fontCache: 'global',
-      scale: 1,
-      displayAlign: 'left',
-      displayIndent: '0em'
-    },
-    startup: {
-      typeset: true,
-      pageReady: () => {
-        return MathJax.typesetPromise();
-      }
-    }
-  };
-</script>
-<script type="text/javascript" id="MathJax-script" async
-  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
-</script>
-""", unsafe_allow_html=True)
-
 # Styles CSS modernes - Design magnifique et simple
 st.markdown("""
 <style>
@@ -1375,88 +1299,6 @@ h1, h2, h3, h4, h5, h6 {
     border: 1px solid #e5e5e5;
 }
 
-/* Styles pour le rendu LaTeX/MathJax - Support complet des environnements */
-.katex-html,
-.MathJax_Display,
-.mjx-chtml,
-.MathJax {
-    color: #0d0d0d !important;
-    font-size: inherit;
-    line-height: 1.75;
-}
-
-/* Conteneurs des équations display (avec \[ \] ou $$ $$) */
-.stMarkdown .katex-display,
-.stMarkdown .MathJax_Display,
-.stMarkdown .mjx-chtml[display="true"],
-.stMarkdown table + .katex-display,
-p:has(> .katex-display),
-div:has(> .MathJax_Display) {
-    background: #f7f7f8 !important;
-    padding: 1.5rem !important;
-    border-radius: 8px !important;
-    border-left: 4px solid #d0d0d0 !important;
-    margin: 1.5rem 0 !important;
-    overflow-x: auto;
-    display: block !important;
-    white-space: normal;
-}
-
-/* Support spécifique des environnements align/aligned */
-.stMarkdown .katex-display .mtable,
-.stMarkdown .MathJax_Display .MathJax_merror,
-.stMarkdown div.MJX_Assistive_MathML {
-    display: inline-block;
-    width: 100%;
-}
-
-/* Équations inline (avec $ $ ou \( \)) */
-.stMarkdown .katex,
-.stMarkdown .MathJax,
-.stMarkdown .mjx-chtml[display="false"],
-.stMarkdown span .katex {
-    font-size: 1.05em;
-    display: inline;
-    margin: 0 0.1em;
-}
-
-/* Améliorations typographiques pour LaTeX */
-.stMarkdown {
-    line-height: 1.7;
-}
-
-/* Support pour tous les types MathJax */
-.mjx-math {
-    color: #0d0d0d !important;
-}
-
-/* Pour les modes CHTML et SVG */
-.mjx-container {
-    display: inline;
-}
-
-.mjx-container[display="true"] {
-    display: block;
-    text-align: left;
-    margin: 1rem 0;
-}
-
-/* Scrolling horizontal pour équations complexes */
-.stMarkdown pre:has(.katex),
-.stMarkdown code:has(.katex) {
-    overflow-x: auto;
-    max-width: 100%;
-    background: transparent;
-    padding: 0;
-}
-
-/* Support du contenu multi-lignes */
-.stMarkdown table.katex-render,
-.stMarkdown .katex-container,
-.stMarkdown .MathJax-Element {
-    width: 100%;
-}
-
 </style>
 """, unsafe_allow_html=True)
 
@@ -1668,177 +1510,15 @@ def initialize_general_llm_with_limits():
         max_tokens=TOKEN_LIMITS["max_tokens_per_request"]
     )
 
-def contains_latex(text: str) -> bool:
-    """Détecte si un texte contient du code LaTeX - support complet"""
-    patterns = [
-        r'\\\[',                    # \[ display
-        r'\\\]',                    # \] display
-        r'\$\$',                    # $$ display
-        r'(?<!\\\)\$(?!\$)',       # Single $ inline
-        r'\\begin\{',               # \begin{ environments
-        r'\\\(',                    # \( inline LaTeX
-        r'\\\)',                    # \) inline LaTeX
-        r'\\frac\{',                # Fractions
-        r'\\sqrt\{',                # Racines carrées
-        r'\\left\\',                # Délimiteurs left
-        r'\\right\\',               # Délimiteurs right
-        r'\\sum\b',                 # Somme
-        r'\\prod\b',                # Produit
-        r'\\int\b',                 # Intégrale
-        r'\\dfrac\{',               # Display fractions
-        r'\\binom\{',               # Binomiales
-        r'\\mathbf\{',              # Bold math
-        r'\\mathbb\{',              # Blackboard bold
-        r'\\mathcal\{',             # Calligraphie
-        r'\\text\{',                # Text dans les formules
-        r'\\displaystyle\b',        # Display style
-    ]
-    return any(re.search(pattern, text) for pattern in patterns)
 
-def extract_latex_equations(text: str):
-    """Extrait toutes les équations LaTeX du texte avec meilleure détection"""
-    equations = []
-    
-    # Trouver les environnements \begin{...}\end{...}
-    equations.extend(re.findall(r'\\begin\{[^}]*\}.*?\\end\{[^}]*\}', text, re.DOTALL))
-    # Trouver les \[ ... \] équations
-    equations.extend(re.findall(r'\\\[.*?\\\]', text, re.DOTALL))
-    # Trouver les $$ ... $$ équations
-    equations.extend(re.findall(r'\$\$.*?\$\$', text, re.DOTALL))
-    # Trouver les \(...\) équations inline
-    equations.extend(re.findall(r'\\\(.*?\\\)', text, re.DOTALL))
-    # Trouver les $ ... $ équations inline (mais pas les $$ )
-    equations.extend(re.findall(r'(?<!\$)\$[^\$]+\$(?!\$)', text, re.DOTALL))
-    # Trouver les fractions seules
-    equations.extend(re.findall(r'\\(?:dfrac|frac|sqrt|mathbf|mathbb|mathcal|text)\{[^}]*\}', text, re.DOTALL))
-    
-    return equations
 
-def render_latex_content(text: str) -> str:
-    """
-    Rendu robuste de contenu LaTeX pour MathJax
-    - Gère tous les types d'équations LaTeX
-    - Nettoie les caractères Unicode corrompus
-    - Préserve les zones protégées
-    Version production v2.1 - ENHANCED
-    - Phase 0: Normalisation aggressive des accents/diacritiques mal formés
-    - Testé avec 10/10 cas de test réalistes et complexes
-    """
-    if not text:
-        return ""
-    
-    # PHASE 0: Normalisation AGGRESSIVE des caractères diacritiques mal formés
-    # Traiter les cas de combining diacriticals mal formés (f̂ → f^, é → e, etc.)
-    # Les caractères Unicode de type "combining mark" qui ne devraient pas être là
-    combining_marks = [
-        '\u0300', '\u0301', '\u0302', '\u0303', '\u0304',  # grave, acute, circumflex, tilde, macron
-        '\u0305', '\u0306', '\u0307', '\u0308', '\u0309',  # overline, breve, dot above, diaeresis, hook above
-        '\u030a', '\u030c', '\u0310', '\u0311', '\u0323',  # ring, caron, candrabindu, horn, dot below
-        '\u0324', '\u0325', '\u0330', '\u0331', '\u0340',  # diaeresis below, ring below, tilde below, macron below
-    ]
-    for mark in combining_marks:
-        text = text.replace(mark, '')
-    
-    # PHASE 1: Normalisation des caractères mal formés / corrompus
-    char_map = {
-        'eˊ': 'é', 'aˋ': 'à', 'uˆ': 'û', 'oˆ': 'ô', 'íˋ': 'í',
-        'eˋ': 'è', 'eˆ': 'ê', 'cˆ': 'ç', 'fˆ': 'f', 'aˆ': 'â', 'iˆ': 'î',
-        '−': '-', '‑': '-', '–': '-', '—': '-', '―': '-',
-        '\u200b': '', '\u200c': '', '\u200d': '', '\u202f': ' ',
-        '⁡': '', 'ˈ': '', '​': '', '\u200e': '', '\u200f': '',
-    }
-    for old, new in char_map.items():
-        text = text.replace(old, new)
-    
-    # PHASE 2: Marquer les zones protégées pour éviter les transformations
-    # Protéger les \[ \]
-    display_delims = re.findall(r'\\\[.*?\\\]', text, re.DOTALL)
-    protected_text = text
-    for i, delim in enumerate(display_delims):
-        protected_text = protected_text.replace(delim, f'__DISPLAY_PROTECTED_{i}__', 1)
-    
-    # Protéger les $$$$
-    dollar_delims = re.findall(r'\$\$.*?\$\$', protected_text, re.DOTALL)
-    for i, delim in enumerate(dollar_delims):
-        protected_text = protected_text.replace(delim, f'__DOLLAR_PROTECTED_{i}__', 1)
-    
-    # PHASE 3: Nettoyer les caractères bizarres
-    protected_text = re.sub(r'!\s*\\', r'\\', protected_text)
-    protected_text = re.sub(r'!\s*([{\[(])', r'\1', protected_text)
-    
-    # PHASE 4: Normaliser les espaces dans les commandes
-    protected_text = re.sub(r'\\(frac|sqrt|dfrac|binom|text|mathbf|mathbb)\s*\{\s*', r'\\\1{', protected_text)
-    protected_text = re.sub(r'\s*\}', r'}', protected_text)
-    
-    # PHASE 5: Convertir les crochets [équation] en $$
-    protected_text = re.sub(
-        r'\[\s*([^\[\]]{10,})\s*\](?!\])',
-        lambda m: f'$${m.group(1).strip()}$$',
-        protected_text
-    )
-    
-    # PHASE 6: Envelopper les \begin{...}\end{...} dans \[...\]
-    envs = r'(aligned|equation|eqnarray|align|gather|multline|flalign|alignat|cases|array|matrix|pmatrix|bmatrix|vmatrix|Vmatrix|split)'
-    protected_text = re.sub(
-        rf'\\begin\{{{envs}\}}\s*(.*?)\s*\\end\{{\1\}}',
-        r'\\\[\n\\begin{\1}\n\2\n\\\]',
-        protected_text,
-        flags=re.DOTALL
-    )
-    
-    # PHASE 7: Normaliser les \( \)
-    protected_text = re.sub(r'\\\((.*?)\\\)', r'$\1$', protected_text, flags=re.DOTALL)
-    
-    # PHASE 8: Nettoyer les espaces autour des délimiteurs
-    protected_text = re.sub(r'(\S)\s+\$\$', r'\1\n\n$$', protected_text)
-    protected_text = re.sub(r'\$\$\s+(\S)', r'$$\n\n\1', protected_text)
-    protected_text = re.sub(r'(\S)\s+\$(?!\$)', r'\1 $', protected_text)
-    protected_text = re.sub(r'(?<!\$)\$\s+(\S)', r'$ \1', protected_text)
-    
-    # PHASE 9: Restaurer les zones protégées
-    for i, delim in enumerate(display_delims):
-        protected_text = protected_text.replace(f'__DISPLAY_PROTECTED_{i}__', delim)
-    for i, delim in enumerate(dollar_delims):
-        protected_text = protected_text.replace(f'__DOLLAR_PROTECTED_{i}__', delim)
-    
-    # PHASE 10: Nettoyage final
-    protected_text = re.sub(r'\n\n\n+', r'\n\n', protected_text)
-    
-    return protected_text.strip()
 
-def display_ai_response_with_latex(response: str, token_manager):
-    """Affiche la réponse de l'IA avec support LaTeX via Markdown"""
-    try:
-        if not response:
-            st.warning("Réponse vide reçue")
-            return
-        
-        tokens_used = token_manager.count_tokens(response)
-        
-        # Convertir les délimiteurs LaTeX et afficher
-        rendered_response = render_latex_content(response)
-        
-        # Utiliser st.markdown qui supporte LaTeX via MathJax
-        st.markdown(rendered_response)
-        
-        with st.expander("ℹ️ Informations sur la réponse Cerebras", expanded=False):
-            col1, col2 = st.columns(2)
-            with col1:
-                st.metric("Tokens utilisés", tokens_used)
-            with col2:
-                st.metric("Longueur", len(response))
-        
-    except Exception as e:
-        st.error(f"Erreur lors de l'affichage: {str(e)}")
-        st.text(response)
 
 def get_cerebras_usage():
     """Récupère les statistiques d'utilisation de Cerebras"""
     try:
-        usage = cerebras_token_manager.get_usage_summary()
-        return usage
     except Exception as e:
-        st.error(f"Erreur lors de la récupération des données d'utilisation: {e}")
+        st.error(f"Impossible de récupérer les données d'utilisation: {str(e)}")
         return None
 
 def display_cerebras_usage_dashboard():
@@ -1880,8 +1560,6 @@ def display_cerebras_usage_dashboard():
             st.metric("Tokens/jour", usage["day"]["tokens"])
 
 def main():
-    add_latex_css()
-    
     # En-tête principal - Premium
     st.markdown("""
     <div class="main-header">
@@ -1901,20 +1579,7 @@ def main():
     display_cerebras_usage_dashboard()
     
     with st.sidebar:
-        st.header("🧪 Test LaTeX avec Cerebras")
-        if st.button("Tester le rendu LaTeX"):
-            test_formulas = [
-                "Formule simple: $f(x) = x^2$",
-                "Optimisation: $$\\min_{x \\in \\mathbb{R}^n} f(x) \\text{ sous } g_i(x) \\leq 0$$",
-                "Gradient: $$\\nabla f(x^*) = 0$$",
-                "Matrice: $$\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}$$",
-                "Intégrale: $$\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}$$"
-            ]
-            
-            st.markdown("### Exemples de rendu LaTeX avec Cerebras:")
-            for formula in test_formulas:
-                rendered = render_latex_content(formula)
-                st.markdown(rendered, unsafe_allow_html=True)
+        pass
     
     # Sélecteur de mode - Élégant
     st.markdown("""
@@ -1964,6 +1629,7 @@ def main():
                 st.rerun()
             
             st.markdown("---")
+
             
             st.subheader("📚 Historique")
             conversations = load_conversations()
@@ -2086,7 +1752,7 @@ def main():
                             st.session_state.num_results = num_results
                             response = safe_qa_call(st.session_state.db, prompt, get_language_prompt(detected_lang))
                             
-                            display_ai_response_with_latex(response, cerebras_token_manager)
+                            st.markdown(response)
                             st.session_state.cs_messages.append({"role": "assistant", "content": response})
                             
                             # Sauvegarde automatique
